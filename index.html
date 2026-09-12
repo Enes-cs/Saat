@@ -3,20 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="format-detection" content="telephone=no">
-  <meta name="theme-color" content="#141c26">
   <title>ÖSYM KPSS Önlisans Duvar Saati & Prova Saati</title>
   <style>
     :root {
       --wall-tone-1: #253342;
       --wall-tone-2: #141c26;
       --clock-scale: 1.0;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-      --safe-left: env(safe-area-inset-left, 0px);
-      --safe-right: env(safe-area-inset-right, 0px);
     }
 
     * {
@@ -25,16 +17,13 @@
       padding: 0;
       user-select: none;
       -webkit-user-select: none;
-      -webkit-touch-callout: none;
     }
 
     html, body {
       width: 100vw;
       height: 100vh;
       height: 100dvh;
-      min-height: -webkit-fill-available;
       overflow: hidden;
-      overscroll-behavior: none;
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
       -webkit-text-size-adjust: 100%;
@@ -69,43 +58,16 @@
       transform: scale(var(--clock-scale));
       transform-origin: center center;
       transition: width 0.35s ease, height 0.35s ease, max-width 0.35s ease, max-height 0.35s ease, transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-      filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.65)) drop-shadow(0 6px 14px rgba(0, 0, 0, 0.4));
+      filter: drop-shadow(0 25px 45px rgba(0, 0, 0, 0.65)) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
     }
 
-    /* Tam Ekran / Mobil Tam Ekran Modu */
     :fullscreen #clock-wrapper,
     :-webkit-full-screen #clock-wrapper,
     .is-fullscreen #clock-wrapper {
-      width: min(92vw, 92dvh);
-      height: min(92vw, 92dvh);
+      width: min(94vw, 94vh);
+      height: min(94vw, 94vh);
       max-width: 950px;
       max-height: 950px;
-    }
-
-    /* iPhone SE ve Küçük Ekran Uyarlaması (Portrait) */
-    @media (max-width: 480px) {
-      #clock-wrapper {
-        width: min(72vw, 38dvh);
-        height: min(72vw, 38dvh);
-        filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.65)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
-      }
-
-      .is-fullscreen #clock-wrapper {
-        width: min(88vw, 68dvh);
-        height: min(88vw, 68dvh);
-      }
-    }
-
-    /* Yatay Mobil (Landscape: 667x375) */
-    @media (max-height: 500px) and (orientation: landscape) {
-      #clock-wrapper {
-        width: min(58dvh, 58vw);
-        height: min(58dvh, 58vw);
-      }
-      .is-fullscreen #clock-wrapper {
-        width: min(88dvh, 88vw);
-        height: min(88dvh, 88vw);
-      }
     }
 
     svg#clock-svg {
@@ -118,26 +80,25 @@
     /* Üst Durum Göstergesi (HUD) */
     .top-hud {
       position: fixed;
-      top: max(14px, calc(var(--safe-top) + 6px));
+      top: 18px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(15, 23, 42, 0.90);
+      background: rgba(15, 23, 42, 0.88);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.14);
       border-radius: 40px;
-      padding: 7px 18px;
+      padding: 8px 22px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       color: #f1f5f9;
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 500;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
       z-index: 20;
-      transition: opacity 0.35s ease, transform 0.35s ease;
+      transition: opacity 0.4s ease, transform 0.4s ease;
       white-space: nowrap;
-      max-width: calc(100vw - 20px);
     }
 
     .top-hud.hidden {
@@ -149,12 +110,12 @@
     .hud-pill {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      padding: 3px 10px;
-      border-radius: 16px;
+      gap: 6px;
+      padding: 3px 12px;
+      border-radius: 20px;
       font-weight: 700;
-      font-size: 12px;
-      letter-spacing: 0.2px;
+      font-size: 12.5px;
+      letter-spacing: 0.3px;
       transition: all 0.25s ease;
     }
 
@@ -170,55 +131,22 @@
       font-variant-numeric: tabular-nums;
       font-weight: 700;
       color: #f59e0b;
-      font-size: 14.5px;
-    }
-
-    @media (max-width: 480px) {
-      .top-hud {
-        top: max(8px, calc(var(--safe-top) + 4px));
-        padding: 5px 12px;
-        gap: 6px;
-        font-size: 11.5px;
-        border-radius: 20px;
-      }
-
-      .hud-pill {
-        padding: 2px 7px;
-        font-size: 11px;
-      }
-
-      .hud-time {
-        font-size: 13.5px;
-      }
-    }
-
-    @media (max-height: 500px) and (orientation: landscape) {
-      .top-hud {
-        top: max(5px, var(--safe-top));
-        padding: 3px 10px;
-        font-size: 11px;
-        gap: 5px;
-      }
-      .hud-pill { padding: 1.5px 6px; font-size: 10.5px; }
-      .hud-time { font-size: 12.5px; }
+      font-size: 15px;
     }
 
     /* Alt Kontrol Paneli */
     .controls-container {
       position: fixed;
-      bottom: max(14px, calc(var(--safe-bottom) + 8px));
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 7px;
+      gap: 8px;
       z-index: 20;
-      transition: opacity 0.35s ease, transform 0.35s ease;
-      width: 100%;
-      max-width: 100vw;
-      padding: 0 10px;
-      pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      max-width: 98vw;
     }
 
     .controls-container.hidden {
@@ -228,20 +156,18 @@
     }
 
     .control-row {
-      pointer-events: auto;
-      background: rgba(15, 23, 42, 0.92);
+      background: rgba(15, 23, 42, 0.88);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 18px;
-      padding: 7px 12px;
+      padding: 8px 14px;
       display: flex;
       align-items: center;
-      gap: 6px;
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
+      gap: 8px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
       flex-wrap: wrap;
       justify-content: center;
-      max-width: 100%;
     }
 
     .c-btn {
@@ -250,48 +176,43 @@
       color: #f8fafc;
       font-size: 12.5px;
       font-weight: 600;
-      padding: 6.5px 12px;
+      padding: 6.5px 13px;
       border-radius: 10px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 5px;
-      transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      gap: 6px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       white-space: nowrap;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-      min-height: 36px;
     }
 
     .c-btn:hover {
       background: rgba(255, 255, 255, 0.18);
       border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
     }
 
-    .c-btn:active {
-      transform: scale(0.95);
-    }
+    .c-btn:active { transform: translateY(1px); }
 
     .c-btn.active {
       background: #2563eb;
       border-color: #60a5fa;
       color: #ffffff;
-      box-shadow: 0 0 12px rgba(37, 99, 235, 0.45);
+      box-shadow: 0 0 14px rgba(37, 99, 235, 0.45);
     }
 
     .c-btn.btn-play.active {
       background: #16a34a;
       border-color: #4ade80;
-      box-shadow: 0 0 12px rgba(22, 163, 74, 0.45);
+      box-shadow: 0 0 14px rgba(22, 163, 74, 0.45);
     }
 
     .c-btn.btn-branch {
       background: rgba(30, 41, 59, 0.85);
       border: 1px solid rgba(148, 163, 184, 0.25);
       color: #e2e8f0;
-      font-size: 11.5px;
-      padding: 6px 10px;
+      font-size: 12px;
+      padding: 6px 11px;
     }
 
     .c-btn.btn-branch:hover {
@@ -330,104 +251,6 @@
       box-shadow: 0 0 12px rgba(219, 39, 119, 0.5);
     }
 
-    /* iPhone SE 3 & Mobil Kontrol Uyarlamaları */
-    @media (max-width: 480px) {
-      .controls-container {
-        bottom: max(8px, calc(var(--safe-bottom) + 4px));
-        gap: 5px;
-        padding: 0 6px;
-      }
-
-      .control-row {
-        padding: 5px 8px;
-        gap: 4px;
-        border-radius: 14px;
-      }
-
-      .c-btn {
-        font-size: 11.5px;
-        padding: 5.5px 8.5px;
-        border-radius: 8px;
-        min-height: 34px;
-        gap: 4px;
-      }
-
-      #mainControlsRow {
-        flex-wrap: nowrap;
-        justify-content: space-between;
-        width: 100%;
-        max-width: 365px;
-      }
-
-      #mainControlsRow .c-btn {
-        flex: 1;
-        padding: 5.5px 4px;
-        font-size: 11px;
-      }
-
-      #branchControlsRow {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        justify-content: flex-start;
-        max-width: calc(100vw - 12px);
-        padding: 5px 8px;
-        scrollbar-width: none;
-      }
-
-      #branchControlsRow::-webkit-scrollbar {
-        display: none;
-      }
-
-      #branchControlsRow .c-btn {
-        flex-shrink: 0;
-        font-size: 11px;
-        padding: 5px 9px;
-        border-radius: 20px;
-      }
-
-      #examControlsRow {
-        flex-wrap: nowrap;
-        justify-content: center;
-        gap: 5px;
-        max-width: 365px;
-        width: 100%;
-      }
-
-      #examControlsRow .c-btn {
-        flex: 1;
-        font-size: 11px;
-        padding: 5.5px 6px;
-      }
-    }
-
-    /* Yatay Mod (Landscape) Kontroller */
-    @media (max-height: 500px) and (orientation: landscape) {
-      .controls-container {
-        bottom: max(4px, var(--safe-bottom));
-        gap: 3px;
-        padding: 0 4px;
-      }
-      .control-row {
-        padding: 4px 8px;
-        gap: 4px;
-        border-radius: 12px;
-      }
-      .c-btn {
-        font-size: 10.5px;
-        padding: 3.5px 7px;
-        min-height: 28px;
-      }
-      #branchControlsRow {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        max-width: calc(100vw - 16px);
-      }
-      #branchControlsRow .c-btn {
-        flex-shrink: 0;
-      }
-    }
-
     /* Dropdown Menü (Genel Kültür Alt Dalları) */
     .dropdown-container {
       position: relative;
@@ -439,7 +262,7 @@
       bottom: calc(100% + 8px);
       left: 50%;
       transform: translateX(-50%) translateY(8px);
-      background: rgba(15, 23, 42, 0.98);
+      background: rgba(15, 23, 42, 0.96);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.16);
@@ -449,7 +272,7 @@
       flex-direction: column;
       gap: 4px;
       min-width: 210px;
-      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.65);
       opacity: 0;
       pointer-events: none;
       transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
@@ -472,17 +295,16 @@
       border: none;
       border-radius: 8px;
       color: #f1f5f9;
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 500;
       cursor: pointer;
       text-align: left;
       transition: background 0.15s ease;
       white-space: nowrap;
-      min-height: 34px;
     }
 
-    .dropdown-item:hover, .dropdown-item:active {
-      background: rgba(255, 255, 255, 0.12);
+    .dropdown-item:hover {
+      background: rgba(255, 255, 255, 0.1);
     }
 
     .dropdown-item .badge {
@@ -498,7 +320,7 @@
     .modal-backdrop {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.72);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       display: flex;
@@ -508,7 +330,6 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.25s ease;
-      padding: 12px;
     }
 
     .modal-backdrop.open {
@@ -520,15 +341,13 @@
       background: #0f172a;
       border: 1px solid rgba(255, 255, 255, 0.16);
       border-radius: 20px;
-      width: 94vw;
-      max-width: 480px;
-      max-height: 88vh;
-      max-height: 88dvh;
+      width: 92vw;
+      max-width: 520px;
+      max-height: 90vh;
       overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      padding: 20px 18px;
+      padding: 24px;
       color: #f8fafc;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
       transform: scale(0.95);
       transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -542,50 +361,44 @@
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding-bottom: 12px;
-      margin-bottom: 16px;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
     }
 
     .modal-header h2 {
-      font-size: 16.5px;
+      font-size: 18px;
       font-weight: 700;
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 8px;
       color: #f1f5f9;
     }
 
     .btn-close-modal {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: transparent;
+      border: none;
       color: #94a3b8;
-      font-size: 16px;
+      font-size: 22px;
       cursor: pointer;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      transition: all 0.15s;
+      line-height: 1;
+      padding: 4px;
+      border-radius: 6px;
+      transition: color 0.15s;
     }
 
-    .btn-close-modal:hover, .btn-close-modal:active {
-      background: rgba(255, 255, 255, 0.2);
-      color: #f8fafc;
-    }
+    .btn-close-modal:hover { color: #f8fafc; }
 
     .modal-section {
-      margin-bottom: 18px;
+      margin-bottom: 20px;
     }
 
     .modal-section-title {
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: #60a5fa;
-      margin-bottom: 9px;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -594,17 +407,21 @@
     .settings-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 10px;
+    }
+
+    @media (max-width: 480px) {
+      .settings-grid { grid-template-columns: 1fr; }
     }
 
     .setting-item {
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 12px;
-      padding: 8px 10px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 6px;
     }
 
     .setting-item label {
@@ -617,20 +434,16 @@
     }
 
     .setting-item input[type="time"] {
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       color: #f8fafc;
-      padding: 6px 8px;
+      padding: 6px 10px;
       border-radius: 8px;
-      font-size: 16px !important;
+      font-size: 14px;
       font-weight: 600;
       font-family: inherit;
       outline: none;
       transition: border-color 0.2s;
-      width: 100%;
-      text-align: center;
-      -webkit-appearance: none;
-      min-height: 38px;
     }
 
     .setting-item input[type="time"]:focus {
@@ -638,53 +451,22 @@
       box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
     }
 
-    @media (max-width: 480px) {
-      .modal-card {
-        padding: 16px 14px;
-        border-radius: 16px;
-      }
-
-      .settings-grid {
-        grid-template-columns: 1fr;
-        gap: 6px;
-      }
-
-      .setting-item {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        padding: 7px 10px;
-      }
-
-      .setting-item label {
-        font-size: 12px;
-        white-space: nowrap;
-      }
-
-      .setting-item input[type="time"] {
-        min-width: 110px;
-        width: 110px;
-        padding: 4px 6px;
-        min-height: 34px;
-      }
-    }
-
     /* Ölçek Kaydırıcı */
     .scale-control-box {
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 12px;
-      padding: 12px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
     }
 
     .scale-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 12.5px;
+      font-size: 13px;
       font-weight: 600;
       color: #cbd5e1;
     }
@@ -700,7 +482,7 @@
 
     .scale-slider {
       width: 100%;
-      height: 8px;
+      height: 6px;
       background: #334155;
       border-radius: 4px;
       outline: none;
@@ -712,8 +494,8 @@
     .scale-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 22px;
-      height: 22px;
+      width: 18px;
+      height: 18px;
       background: #60a5fa;
       border: 2px solid #ffffff;
       border-radius: 50%;
@@ -722,13 +504,14 @@
     }
 
     .scale-presets {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 5px;
+      display: flex;
+      gap: 6px;
+      justify-content: space-between;
     }
 
     .btn-preset {
-      padding: 6px 4px;
+      flex: 1;
+      padding: 5px 8px;
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 6px;
@@ -738,31 +521,19 @@
       cursor: pointer;
       text-align: center;
       transition: all 0.15s;
-      white-space: nowrap;
     }
 
-    .btn-preset:hover, .btn-preset:active {
-      background: rgba(255, 255, 255, 0.16);
-      color: #ffffff;
-    }
-
-    .btn-preset.primary {
-      background: rgba(37, 99, 235, 0.25);
-      border-color: rgba(96, 165, 250, 0.4);
-      color: #93c5fd;
-    }
-
-    .btn-preset.primary:hover {
-      background: rgba(37, 99, 235, 0.45);
+    .btn-preset:hover {
+      background: rgba(255, 255, 255, 0.14);
       color: #ffffff;
     }
 
     .modal-actions {
       display: flex;
-      gap: 8px;
-      margin-top: 18px;
+      gap: 10px;
+      margin-top: 24px;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding-top: 14px;
+      padding-top: 16px;
     }
 
     .btn-save-settings {
@@ -770,9 +541,9 @@
       background: #2563eb;
       border: 1px solid #60a5fa;
       color: #ffffff;
-      padding: 9px 14px;
+      padding: 10px 16px;
       border-radius: 10px;
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 700;
       cursor: pointer;
       display: flex;
@@ -781,10 +552,9 @@
       gap: 6px;
       box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
       transition: all 0.2s;
-      min-height: 42px;
     }
 
-    .btn-save-settings:hover, .btn-save-settings:active {
+    .btn-save-settings:hover {
       background: #1d4ed8;
       transform: translateY(-1px);
     }
@@ -794,9 +564,9 @@
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.18);
       color: #cbd5e1;
-      padding: 9px 10px;
+      padding: 10px 14px;
       border-radius: 10px;
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 600;
       cursor: pointer;
       display: flex;
@@ -804,11 +574,9 @@
       align-items: center;
       gap: 4px;
       transition: all 0.2s;
-      min-height: 42px;
-      white-space: nowrap;
     }
 
-    .btn-reset-settings:hover, .btn-reset-settings:active {
+    .btn-reset-settings:hover {
       background: rgba(255, 255, 255, 0.16);
       color: #ffffff;
     }
@@ -820,13 +588,99 @@
       color: rgba(255, 255, 255, 0.3);
       pointer-events: none;
       z-index: 10;
-      text-align: center;
-      padding: 0 10px;
     }
 
+    /* iPhone SE 3 ve Mobil Tam Uyum (Dikey) */
     @media (max-width: 480px) {
+      #clock-wrapper {
+        width: min(68vw, 36dvh);
+        height: min(68vw, 36dvh);
+        margin-bottom: 22px;
+      }
+
+      .top-hud {
+        top: max(8px, env(safe-area-inset-top));
+        padding: 5px 12px;
+        font-size: 11.5px;
+        gap: 6px;
+        max-width: 96vw;
+        border-radius: 20px;
+      }
+
+      .hud-pill {
+        padding: 2px 8px;
+        font-size: 11px;
+      }
+
+      .hud-time {
+        font-size: 13.5px;
+      }
+
+      .controls-container {
+        bottom: max(8px, env(safe-area-inset-bottom));
+        gap: 5px;
+        max-width: 96vw;
+        width: 96vw;
+      }
+
+      .control-row {
+        padding: 5px 8px;
+        gap: 4px;
+        border-radius: 14px;
+      }
+
+      .c-btn {
+        font-size: 11px;
+        padding: 5px 8px;
+        border-radius: 8px;
+        gap: 4px;
+        min-height: 32px;
+      }
+
+      .c-btn.btn-branch {
+        font-size: 10.5px;
+        padding: 4.5px 7px;
+      }
+
+      .modal-card {
+        padding: 16px 14px;
+        max-height: 85dvh;
+        border-radius: 16px;
+      }
+
+      .setting-item input[type="time"] {
+        font-size: 16px;
+      }
+
       .screen-hint {
         display: none;
+      }
+    }
+
+    /* Yatay Mobil Mod (Landscape) */
+    @media (max-height: 500px) and (orientation: landscape) {
+      #clock-wrapper {
+        width: min(58dvh, 58vw);
+        height: min(58dvh, 58vw);
+        margin-bottom: 0;
+      }
+      .top-hud {
+        top: max(4px, env(safe-area-inset-top));
+        padding: 3px 10px;
+        font-size: 11px;
+      }
+      .controls-container {
+        bottom: max(4px, env(safe-area-inset-bottom));
+        gap: 3px;
+      }
+      .control-row {
+        padding: 4px 8px;
+        gap: 4px;
+      }
+      .c-btn {
+        font-size: 10px;
+        padding: 3px 6px;
+        min-height: 26px;
       }
     }
   </style>
@@ -960,7 +814,7 @@
   <!-- Alt Kontrol Paneli -->
   <div id="controlsContainer" class="controls-container">
     <!-- Ana Mod ve Araç Çubuğu -->
-    <div id="mainControlsRow" class="control-row">
+    <div class="control-row">
       <button id="btnModeReal" class="c-btn active" title="Gerçek Saat">
         <span>🕒 Gerçek Saat</span>
       </button>
@@ -975,7 +829,7 @@
       </button>
     </div>
 
-    <!-- Hızlı Branş / Bölüm Seçici Çubuğu (Prova Modu Açıkken Aktif - Mobilde Yatay Kaydırılabilir) -->
+    <!-- Hızlı Branş / Bölüm Seçici Çubuğu (Prova Modu Açıkken Aktif) -->
     <div id="branchControlsRow" class="control-row" style="display: none;">
       <button id="btnBranchTurkce" class="c-btn btn-branch" title="Türkçe Branşına Başla">
         <span>📖 Türkçe (<span class="lbl-time-turkce">10:15</span>)</span>
@@ -1020,7 +874,7 @@
         <span id="txtPlayPause">⏸️ Duraklat</span>
       </button>
       <button id="btnResetExam" class="c-btn" title="Sınav Başlangıcına Sıfırla">
-        <span>🔄 Başa Al (<span class="lbl-time-start">10:15</span>)</span>
+        <span>🔄 Başa Sıfırla</span>
       </button>
       <button id="btnToggleSound" class="c-btn" title="Saniye Tik-Tak Sesi">
         <span id="txtSound">🔇 Ses: Kapalı</span>
@@ -1046,10 +900,10 @@
           </div>
           <input type="range" id="scaleSlider" class="scale-slider" min="50" max="160" step="5" value="100">
           <div class="scale-presets">
-            <button class="btn-preset" data-scale="75">%75</button>
-            <button class="btn-preset" data-scale="100">%100</button>
-            <button class="btn-preset" data-scale="125">%125</button>
-            <button class="btn-preset" data-scale="150">%150</button>
+            <button class="btn-preset" data-scale="75">Küçük (%75)</button>
+            <button class="btn-preset" data-scale="100">Standart (%100)</button>
+            <button class="btn-preset" data-scale="125">Büyük (%125)</button>
+            <button class="btn-preset" data-scale="150">Maksimum (%150)</button>
           </div>
         </div>
       </div>
@@ -1057,16 +911,9 @@
       <!-- 2. Bölüm ve Branş Saatleri Ayarı -->
       <div class="modal-section">
         <div class="modal-section-title">🕒 Branş ve Sınav Saatleri</div>
-        
-        <!-- Hızlı Dağıtım Butonları -->
-        <div style="display: flex; gap: 6px; margin-bottom: 10px;">
-          <button type="button" id="btnOsymStandardTimes" class="btn-preset primary" style="flex: 1; padding: 7px 4px;">🏛️ ÖSYM Standart (10:15)</button>
-          <button type="button" id="btnAutoDistributeTimes" class="btn-preset" style="flex: 1; padding: 7px 4px;">⚡ 130 Dk Otomatik Dağıt</button>
-        </div>
-
         <div class="settings-grid">
-          <div class="setting-item" style="border-color: rgba(59, 130, 246, 0.35); background: rgba(37, 99, 235, 0.08);">
-            <label for="inpExamStart"><strong>🏁 Sınav Başlangıç:</strong></label>
+          <div class="setting-item">
+            <label for="inpExamStart">Sınav Başlangıç:</label>
             <input type="time" id="inpExamStart" value="10:15">
           </div>
 
@@ -1095,8 +942,8 @@
             <input type="time" id="inpVatandaslikStart" value="12:20">
           </div>
 
-          <div class="setting-item" style="grid-column: 1 / -1; border-color: rgba(239, 68, 68, 0.35); background: rgba(239, 68, 68, 0.08);">
-            <label for="inpExamEnd"><strong>🏁 Sınav Bitiş (130 Dk):</strong></label>
+          <div class="setting-item" style="grid-column: 1 / -1;">
+            <label for="inpExamEnd">🏁 Sınav Bitiş Saati:</label>
             <input type="time" id="inpExamEnd" value="12:25">
           </div>
         </div>
@@ -1104,8 +951,8 @@
 
       <!-- Butonlar -->
       <div class="modal-actions">
-        <button id="btnSaveSettings" class="btn-save-settings">💾 Ayarları Kaydet & Başlat</button>
-        <button id="btnResetSettingsDefault" class="btn-reset-settings" title="ÖSYM 10:15 standart ayarlarına döndür">🔄 Varsayılana Dön</button>
+        <button id="btnSaveSettings" class="btn-save-settings">💾 Ayarları Kaydet</button>
+        <button id="btnResetSettingsDefault" class="btn-reset-settings">🔄 Varsayılana Dön</button>
       </div>
     </div>
   </div>
@@ -1146,7 +993,7 @@
       numbersGroup.appendChild(text);
     }
 
-    // 2. Varsayılan Ayarlar & Konfigürasyon (ÖSYM KPSS 130 Dakika)
+    // 2. Varsayılan Ayarlar & Konfigürasyon
     const DEFAULT_CONFIG = {
       scale: 100,
       examStart: '10:15',
@@ -1160,71 +1007,18 @@
 
     let config = { ...DEFAULT_CONFIG };
 
-    function timeStringToSeconds(tStr) {
-      if (!tStr || typeof tStr !== 'string') return 0;
-      const parts = tStr.split(':');
-      const h = parseInt(parts[0], 10) || 0;
-      const m = parseInt(parts, 10) || 0;
-      const s = parseInt(parts[2], 10) || 0;
-      return h * 3600 + m * 60 + s;
-    }
-
-    function secondsToTimeString(sec) {
-      sec = Math.round(sec) % 86400;
-      if (sec < 0) sec += 86400;
-      const h = Math.floor(sec / 3600);
-      const m = Math.floor((sec % 3600) / 60);
-      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-    }
-
-    // Kronolojik doğrulama ve otomatik onarım
-    function validateAndRepairConfig(cfg) {
-      const repaired = { ...DEFAULT_CONFIG, ...cfg };
-      const t_start = timeStringToSeconds(repaired.examStart);
-      const t_turkce = timeStringToSeconds(repaired.turkceStart);
-      const t_mat = timeStringToSeconds(repaired.matStart);
-      const t_gk = timeStringToSeconds(repaired.gkStart);
-      const t_cog = timeStringToSeconds(repaired.cografyaStart);
-      const t_vat = timeStringToSeconds(repaired.vatandaslikStart);
-      const t_end = timeStringToSeconds(repaired.examEnd);
-
-      const isValid = (
-        t_start <= t_turkce &&
-        t_turkce < t_mat &&
-        t_mat < t_gk &&
-        t_gk < t_cog &&
-        t_cog < t_vat &&
-        t_vat < t_end
-      );
-
-      if (!isValid) {
-        return { ...DEFAULT_CONFIG, scale: repaired.scale || 100 };
-      }
-      return repaired;
-    }
-
-    function calculateScheduleFromStart(startStr) {
-      const sSec = timeStringToSeconds(startStr);
-      return {
-        examStart: startStr,
-        turkceStart: startStr,
-        matStart: secondsToTimeString(sSec + 40 * 60),        // +40 dk Türkçe
-        gkStart: secondsToTimeString(sSec + 100 * 60),       // +60 dk Matematik
-        cografyaStart: secondsToTimeString(sSec + 115 * 60), // +15 dk Tarih
-        vatandaslikStart: secondsToTimeString(sSec + 125 * 60), // +10 dk Coğrafya
-        examEnd: secondsToTimeString(sSec + 130 * 60)        // +5 dk Vatandaşlık (Toplam 130 dk)
-      };
-    }
-
     function loadSavedConfig() {
       try {
         const saved = localStorage.getItem('osym_clock_user_config');
         if (saved) {
           const parsed = JSON.parse(saved);
-          config = validateAndRepairConfig(parsed);
-          saveConfig();
-        } else {
-          config = { ...DEFAULT_CONFIG };
+          config = { ...DEFAULT_CONFIG, ...parsed };
+
+          // Tarayıcı hafızasında Matematik saati hatalı kaldıysa (10:10 gibi), varsayılana döndür
+          if (timeStringToSeconds(config.matStart) <= timeStringToSeconds(config.turkceStart)) {
+            config.matStart = DEFAULT_CONFIG.matStart;
+            localStorage.setItem('osym_clock_user_config', JSON.stringify(config));
+          }
         }
       } catch (e) {
         config = { ...DEFAULT_CONFIG };
@@ -1240,13 +1034,28 @@
       } catch (e) {}
     }
 
+    function timeStringToSeconds(tStr) {
+      if (!tStr) return 0;
+      const parts = tStr.split(':');
+      const h = parseInt(parts[0], 10) || 0;
+      const m = parseInt(parts, 10) || 0;
+      const s = parseInt(parts, 10) || 0;
+      return h * 3600 + m * 60 + s;
+    }
+
+    function secondsToTimeString(sec) {
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+    }
+
     // 3. Çalışma Durumu Değişkenleri
     let currentMode = 'real'; // 'real' | 'exam'
     let isExamRunning = true;
     let isSoundOn = false;
     let activeBranchKey = 'turkce';
 
-    let examSeconds = timeStringToSeconds(DEFAULT_CONFIG.examStart);
+    let examSeconds = timeStringToSeconds(config.examStart);
     let lastTimestamp = performance.now();
     let lastSecondTick = -1;
 
@@ -1290,8 +1099,6 @@
     const btnCloseSettingsX = document.getElementById('btnCloseSettingsX');
     const btnSaveSettings = document.getElementById('btnSaveSettings');
     const btnResetSettingsDefault = document.getElementById('btnResetSettingsDefault');
-    const btnOsymStandardTimes = document.getElementById('btnOsymStandardTimes');
-    const btnAutoDistributeTimes = document.getElementById('btnAutoDistributeTimes');
 
     const scaleSlider = document.getElementById('scaleSlider');
     const scaleValueBadge = document.getElementById('scaleValueBadge');
@@ -1315,7 +1122,6 @@
       applyScale(config.scale);
 
       // Butonlardaki saat etiketlerini güncelle
-      document.querySelectorAll('.lbl-time-start').forEach(el => el.textContent = config.examStart);
       document.querySelectorAll('.lbl-time-turkce').forEach(el => el.textContent = config.turkceStart);
       document.querySelectorAll('.lbl-time-mat').forEach(el => el.textContent = config.matStart);
       document.querySelectorAll('.lbl-time-gk').forEach(el => el.textContent = config.gkStart);
@@ -1338,20 +1144,11 @@
 
     // Ses Motoru
     let audioContext = null;
-    function initAudio() {
-      if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioContext && audioContext.state === 'suspended') {
-        audioContext.resume();
-      }
-    }
-
     function triggerTickAudio() {
       if (!isSoundOn) return;
       try {
-        initAudio();
-        if (!audioContext) return;
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === 'suspended') audioContext.resume();
 
         const osc = audioContext.createOscillator();
         const gain = audioContext.createGain();
@@ -1371,7 +1168,7 @@
 
     // Render Döngüsü
     function render(now) {
-      const delta = Math.min((now - lastTimestamp) / 1000, 1.0);
+      const delta = (now - lastTimestamp) / 1000;
       lastTimestamp = now;
 
       let h, m, s;
@@ -1425,12 +1222,7 @@
 
     // HUD ve Kalan Süre Güncelleme
     function updateExamHUD() {
-      const examStartSec = timeStringToSeconds(config.examStart);
-      let examEndSec = timeStringToSeconds(config.examEnd);
-      if (examEndSec <= examStartSec) {
-        examEndSec = examStartSec + 130 * 60;
-      }
-
+      const examEndSec = timeStringToSeconds(config.examEnd);
       const remainingSec = Math.max(0, examEndSec - examSeconds);
       const remMins = Math.floor(remainingSec / 60);
       const remSecs = Math.floor(remainingSec % 60);
@@ -1442,30 +1234,29 @@
       const cSec = timeStringToSeconds(config.cografyaStart);
       const vSec = timeStringToSeconds(config.vatandaslikStart);
 
-      const isMobile = window.innerWidth <= 480;
-
+      // Hangi bölümde olduğumuzu belirle
       if (examSeconds >= examEndSec) {
-        examSectionPill.textContent = '🏁 Bitti';
+        examSectionPill.textContent = '🏁 Sınav Bitti';
         examSectionPill.className = 'hud-pill bitti';
         highlightBranchButton('');
       } else if (examSeconds < mSec) {
-        examSectionPill.textContent = isMobile ? 'Türkçe' : 'Türkçe Bölümü';
+        examSectionPill.textContent = 'Türkçe Bölümü';
         examSectionPill.className = 'hud-pill turkce';
         highlightBranchButton('turkce');
       } else if (examSeconds < gSec) {
-        examSectionPill.textContent = isMobile ? 'Matematik' : 'Matematik Bölümü';
+        examSectionPill.textContent = 'Matematik Bölümü';
         examSectionPill.className = 'hud-pill matematik';
         highlightBranchButton('matematik');
       } else if (examSeconds < cSec) {
-        examSectionPill.textContent = isMobile ? 'Tarih' : 'Tarih (GK) Bölümü';
+        examSectionPill.textContent = 'Tarih (GK) Bölümü';
         examSectionPill.className = 'hud-pill tarih';
         highlightBranchButton('gk');
       } else if (examSeconds < vSec) {
-        examSectionPill.textContent = isMobile ? 'Coğrafya' : 'Coğrafya (GK)';
+        examSectionPill.textContent = 'Coğrafya (GK) Bölümü';
         examSectionPill.className = 'hud-pill cografya';
         highlightBranchButton('cografya');
       } else {
-        examSectionPill.textContent = isMobile ? 'Vatandaşlık' : 'Vatandaşlık & Güncel';
+        examSectionPill.textContent = 'Vatandaşlık & Güncel';
         examSectionPill.className = 'hud-pill vatandaslik';
         highlightBranchButton('vatandaslik');
       }
@@ -1485,14 +1276,13 @@
         txtPlayPause.textContent = '⏸️ Duraklat';
         btnPlayPause.classList.add('active');
       } else {
-        txtPlayPause.textContent = '▶️ Başlat';
+        txtPlayPause.textContent = '▶️ Devam Et';
         btnPlayPause.classList.remove('active');
       }
     }
 
     // Branş Atlama ve Başlatma Fonksiyonu
     function jumpToBranch(timeString, branchKey) {
-      initAudio();
       if (currentMode !== 'exam') {
         setExamMode();
       }
@@ -1501,7 +1291,6 @@
       updatePlayPauseButton();
       updateExamHUD();
       highlightBranchButton(branchKey);
-      triggerTickAudio();
       if (gkDropdownMenu) gkDropdownMenu.classList.remove('show');
     }
 
@@ -1512,7 +1301,7 @@
       examControlsRow.style.display = 'none';
       branchControlsRow.style.display = 'none';
       examSectionWrapper.style.display = 'none';
-      modeDisplayLabel.textContent = window.innerWidth <= 480 ? '🕒 Canlı' : '🕒 Canlı Gerçek Saat';
+      modeDisplayLabel.textContent = '🕒 Canlı Gerçek Saat';
       if (gkDropdownMenu) gkDropdownMenu.classList.remove('show');
     }
 
@@ -1523,17 +1312,7 @@
       examControlsRow.style.display = 'flex';
       branchControlsRow.style.display = 'flex';
       examSectionWrapper.style.display = 'inline-flex';
-      modeDisplayLabel.textContent = window.innerWidth <= 480 ? '📝 Prova Saati' : '📝 KPSS Prova Saati';
-
-      const examStartSec = timeStringToSeconds(config.examStart);
-      const examEndSec = timeStringToSeconds(config.examEnd);
-
-      if (examSeconds >= examEndSec || examSeconds < examStartSec) {
-        examSeconds = examStartSec;
-        isExamRunning = true;
-      }
-
-      updatePlayPauseButton();
+      modeDisplayLabel.textContent = '📝 KPSS Prova Saati';
       updateExamHUD();
     }
 
@@ -1541,7 +1320,6 @@
     btnModeExam.addEventListener('click', setExamMode);
 
     btnPlayPause.addEventListener('click', () => {
-      initAudio();
       isExamRunning = !isExamRunning;
       updatePlayPauseButton();
     });
@@ -1554,11 +1332,12 @@
     });
 
     btnToggleSound.addEventListener('click', () => {
-      initAudio();
       isSoundOn = !isSoundOn;
       if (isSoundOn) {
         txtSound.textContent = '🔊 Ses: Açık';
         btnToggleSound.classList.add('active');
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === 'suspended') audioContext.resume();
       } else {
         txtSound.textContent = '🔇 Ses: Kapalı';
         btnToggleSound.classList.remove('active');
@@ -1575,57 +1354,41 @@
     });
 
     btnBranchGk.addEventListener('click', (e) => {
+      // Tıklandığında hem doğrudan GK saatine atlasın hem de dropdown'u toggle etsin
       if (e.target.closest('#btnBranchGk')) {
         jumpToBranch(config.gkStart, 'gk');
         gkDropdownMenu.classList.toggle('show');
       }
     });
 
-    btnSubTarih.addEventListener('click', () => jumpToBranch(config.gkStart, 'gk'));
-    btnSubCografya.addEventListener('click', () => jumpToBranch(config.cografyaStart, 'cografya'));
-    btnSubVatandaslik.addEventListener('click', () => jumpToBranch(config.vatandaslikStart, 'vatandaslik'));
-    btnBranchCografyaDirect.addEventListener('click', () => jumpToBranch(config.cografyaStart, 'cografya'));
-    btnBranchVatDirect.addEventListener('click', () => jumpToBranch(config.vatandaslikStart, 'vatandaslik'));
+    btnSubTarih.addEventListener('click', () => {
+      jumpToBranch(config.gkStart, 'gk');
+    });
 
+    btnSubCografya.addEventListener('click', () => {
+      jumpToBranch(config.cografyaStart, 'cografya');
+    });
+
+    btnSubVatandaslik.addEventListener('click', () => {
+      jumpToBranch(config.vatandaslikStart, 'vatandaslik');
+    });
+
+    btnBranchCografyaDirect.addEventListener('click', () => {
+      jumpToBranch(config.cografyaStart, 'cografya');
+    });
+
+    btnBranchVatDirect.addEventListener('click', () => {
+      jumpToBranch(config.vatandaslikStart, 'vatandaslik');
+    });
+
+    // Sayfa dışı tıklamalarda dropdown kapat
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.dropdown-container')) {
         if (gkDropdownMenu) gkDropdownMenu.classList.remove('show');
       }
     });
 
-    inpExamStart.addEventListener('change', () => {
-      const val = inpExamStart.value;
-      if (!val) return;
-      const schedule = calculateScheduleFromStart(val);
-      inpTurkceStart.value = schedule.turkceStart;
-      inpMatStart.value = schedule.matStart;
-      inpGkStart.value = schedule.gkStart;
-      inpCografyaStart.value = schedule.cografyaStart;
-      inpVatandaslikStart.value = schedule.vatandaslikStart;
-      inpExamEnd.value = schedule.examEnd;
-    });
-
-    btnAutoDistributeTimes.addEventListener('click', () => {
-      const val = inpExamStart.value || DEFAULT_CONFIG.examStart;
-      const schedule = calculateScheduleFromStart(val);
-      inpTurkceStart.value = schedule.turkceStart;
-      inpMatStart.value = schedule.matStart;
-      inpGkStart.value = schedule.gkStart;
-      inpCografyaStart.value = schedule.cografyaStart;
-      inpVatandaslikStart.value = schedule.vatandaslikStart;
-      inpExamEnd.value = schedule.examEnd;
-    });
-
-    btnOsymStandardTimes.addEventListener('click', () => {
-      inpExamStart.value = DEFAULT_CONFIG.examStart;
-      inpTurkceStart.value = DEFAULT_CONFIG.turkceStart;
-      inpMatStart.value = DEFAULT_CONFIG.matStart;
-      inpGkStart.value = DEFAULT_CONFIG.gkStart;
-      inpCografyaStart.value = DEFAULT_CONFIG.cografyaStart;
-      inpVatandaslikStart.value = DEFAULT_CONFIG.vatandaslikStart;
-      inpExamEnd.value = DEFAULT_CONFIG.examEnd;
-    });
-
+    // Ayarlar Modalı İşlemleri
     function openSettingsModal() {
       settingsModalBackdrop.classList.add('open');
       applyConfigToUI();
@@ -1644,121 +1407,64 @@
       }
     });
 
+    // Canlı Ölçek Kaydırıcı
     scaleSlider.addEventListener('input', (e) => {
       applyScale(e.target.value);
     });
 
-    document.querySelectorAll('.btn-preset[data-scale]').forEach(btn => {
+    document.querySelectorAll('.btn-preset').forEach(btn => {
       btn.addEventListener('click', () => {
         const val = btn.getAttribute('data-scale');
         applyScale(val);
       });
     });
 
+    // Ayarları Kaydet
     btnSaveSettings.addEventListener('click', () => {
-      const startStr = inpExamStart.value || DEFAULT_CONFIG.examStart;
-      const startSec = timeStringToSeconds(startStr);
-      let endStr = inpExamEnd.value || secondsToTimeString(startSec + 130 * 60);
-      let endSec = timeStringToSeconds(endStr);
-
-      if (endSec <= startSec) {
-        endStr = secondsToTimeString(startSec + 130 * 60);
-      }
-
-      config = validateAndRepairConfig({
-        examStart: startStr,
-        turkceStart: inpTurkceStart.value || startStr,
-        matStart: inpMatStart.value || secondsToTimeString(startSec + 40 * 60),
-        gkStart: inpGkStart.value || secondsToTimeString(startSec + 100 * 60),
-        cografyaStart: inpCografyaStart.value || secondsToTimeString(startSec + 115 * 60),
-        vatandaslikStart: inpVatandaslikStart.value || secondsToTimeString(startSec + 125 * 60),
-        examEnd: endStr,
-        scale: parseInt(scaleSlider.value, 10) || 100
-      });
+      config.examStart = inpExamStart.value || DEFAULT_CONFIG.examStart;
+      config.turkceStart = inpTurkceStart.value || DEFAULT_CONFIG.turkceStart;
+      config.matStart = inpMatStart.value || DEFAULT_CONFIG.matStart;
+      config.gkStart = inpGkStart.value || DEFAULT_CONFIG.gkStart;
+      config.cografyaStart = inpCografyaStart.value || DEFAULT_CONFIG.cografyaStart;
+      config.vatandaslikStart = inpVatandaslikStart.value || DEFAULT_CONFIG.vatandaslikStart;
+      config.examEnd = inpExamEnd.value || DEFAULT_CONFIG.examEnd;
+      config.scale = parseInt(scaleSlider.value, 10) || 100;
 
       saveConfig();
       applyConfigToUI();
-
-      examSeconds = timeStringToSeconds(config.examStart);
-      isExamRunning = true;
-      updatePlayPauseButton();
-      updateExamHUD();
-
       closeSettingsModal();
     });
 
+    // Ayarları Varsayılana Sıfırla
     btnResetSettingsDefault.addEventListener('click', () => {
-      if (confirm('Bütün sınav saatlerini ve ölçeği ÖSYM varsayılan KPSS ayarlarına (10:15 - 12:25, 130 Dk) döndürmek istiyor musunuz?')) {
-        localStorage.removeItem('osym_clock_user_config');
+      if (confirm('Bütün saatleri ve ölçeği varsayılan KPSS ayarlarına döndürmek istiyor musunuz?')) {
         config = { ...DEFAULT_CONFIG };
         saveConfig();
         applyConfigToUI();
-        examSeconds = timeStringToSeconds(config.examStart);
-        isExamRunning = true;
-        updatePlayPauseButton();
-        updateExamHUD();
-        closeSettingsModal();
       }
     });
 
-    function isFullscreenActive() {
-      return !!(
-        document.fullscreenElement ||
-        document.webkitFullscreenElement ||
-        document.body.classList.contains('is-fullscreen')
-      );
-    }
-
-    function updateFullscreenButton() {
-      const isFull = isFullscreenActive();
-      if (isFull) {
-        btnFullscreenToggle.classList.add('active');
-        btnFullscreenToggle.innerHTML = '<span>✕ Küçült</span>';
-      } else {
-        btnFullscreenToggle.classList.remove('active');
-        btnFullscreenToggle.innerHTML = '<span>⛶ Tam Ekran</span>';
-      }
-    }
-
+    // Tam Ekran İşlemleri (iOS Safari Uyumlu)
     function toggleFullscreen() {
-      const isFull = isFullscreenActive();
-      if (!isFull) {
+      if (!document.fullscreenElement) {
         if (document.documentElement.requestFullscreen) {
           document.documentElement.requestFullscreen().then(() => {
             document.body.classList.add('is-fullscreen');
-            updateFullscreenButton();
           }).catch(() => {
-            document.body.classList.add('is-fullscreen');
-            updateFullscreenButton();
+            document.body.classList.toggle('is-fullscreen');
           });
-        } else if (document.documentElement.webkitRequestFullscreen) {
-          try {
-            document.documentElement.webkitRequestFullscreen();
-          } catch (e) {}
-          document.body.classList.add('is-fullscreen');
-          updateFullscreenButton();
         } else {
-          document.body.classList.add('is-fullscreen');
-          updateFullscreenButton();
+          document.body.classList.toggle('is-fullscreen');
         }
       } else {
-        if (document.exitFullscreen && document.fullscreenElement) {
+        if (document.exitFullscreen) {
           document.exitFullscreen().then(() => {
             document.body.classList.remove('is-fullscreen');
-            updateFullscreenButton();
           }).catch(() => {
             document.body.classList.remove('is-fullscreen');
-            updateFullscreenButton();
           });
-        } else if (document.webkitExitFullscreen && document.webkitFullscreenElement) {
-          try {
-            document.webkitExitFullscreen();
-          } catch (e) {}
-          document.body.classList.remove('is-fullscreen');
-          updateFullscreenButton();
         } else {
           document.body.classList.remove('is-fullscreen');
-          updateFullscreenButton();
         }
       }
     }
@@ -1771,24 +1477,20 @@
       } else {
         document.body.classList.remove('is-fullscreen');
       }
-      updateFullscreenButton();
     });
 
-    document.addEventListener('webkitfullscreenchange', () => {
-      if (document.webkitFullscreenElement) {
-        document.body.classList.add('is-fullscreen');
-      } else {
-        document.body.classList.remove('is-fullscreen');
-      }
-      updateFullscreenButton();
-    });
-
+    // Otomatik Kontrol Gizleme (Idle)
     let idleTimeout = null;
-    function resetIdleTimer() {
+    function handleUserActivity() {
+      controlsContainer.classList.remove('hidden');
+      topHud.classList.remove('hidden');
       clearTimeout(idleTimeout);
+
+      // Modal veya dropdown açıkken kontrolleri gizleme
       if (settingsModalBackdrop.classList.contains('open') || (gkDropdownMenu && gkDropdownMenu.classList.contains('show'))) {
         return;
       }
+
       idleTimeout = setTimeout(() => {
         if (!settingsModalBackdrop.classList.contains('open') && (!gkDropdownMenu || !gkDropdownMenu.classList.contains('show'))) {
           controlsContainer.classList.add('hidden');
@@ -1797,30 +1499,10 @@
       }, 3500);
     }
 
-    function showControls() {
-      controlsContainer.classList.remove('hidden');
-      topHud.classList.remove('hidden');
-      resetIdleTimer();
-    }
-
-    window.addEventListener('mousemove', showControls);
-
-    document.body.addEventListener('click', (e) => {
-      if (e.target.closest('#controlsContainer') || e.target.closest('.modal-backdrop') || e.target.closest('.top-hud')) {
-        resetIdleTimer();
-        return;
-      }
-      const isHidden = controlsContainer.classList.contains('hidden');
-      if (isHidden) {
-        showControls();
-      } else {
-        controlsContainer.classList.add('hidden');
-        topHud.classList.add('hidden');
-      }
-    });
-
+    window.addEventListener('mousemove', handleUserActivity);
+    window.addEventListener('touchstart', handleUserActivity);
     window.addEventListener('keydown', (e) => {
-      showControls();
+      handleUserActivity();
       if (e.key === 'Escape') {
         if (settingsModalBackdrop.classList.contains('open')) {
           closeSettingsModal();
@@ -1836,27 +1518,15 @@
       if (e.key === ' ') {
         if (currentMode === 'exam' && !settingsModalBackdrop.classList.contains('open')) {
           e.preventDefault();
-          initAudio();
           isExamRunning = !isExamRunning;
           updatePlayPauseButton();
         }
       }
     });
 
-    window.addEventListener('resize', () => {
-      if (currentMode === 'real') {
-        modeDisplayLabel.textContent = window.innerWidth <= 480 ? '🕒 Canlı' : '🕒 Canlı Gerçek Saat';
-      } else {
-        modeDisplayLabel.textContent = window.innerWidth <= 480 ? '📝 Prova Saati' : '📝 KPSS Prova Saati';
-      }
-      if (currentMode === 'exam') {
-        updateExamHUD();
-      }
-    });
-
     // Başlangıç
     loadSavedConfig();
-    showControls();
+    handleUserActivity();
     requestAnimationFrame(render);
   </script>
 </body>
