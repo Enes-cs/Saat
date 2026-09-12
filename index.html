@@ -270,7 +270,7 @@
     }
 
     .c-btn:active {
-      transform: scale(0.96);
+      transform: scale(0.95);
     }
 
     .c-btn.active {
@@ -1177,17 +1177,42 @@
       return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
     }
 
-    // Sınav başlangıç saatine göre branşları standart 130 dakikalık KPSS akışına otomatik dağıt
+    // Kronolojik doğrulama ve otomatik onarım
+    function validateAndRepairConfig(cfg) {
+      const repaired = { ...DEFAULT_CONFIG, ...cfg };
+      const t_start = timeStringToSeconds(repaired.examStart);
+      const t_turkce = timeStringToSeconds(repaired.turkceStart);
+      const t_mat = timeStringToSeconds(repaired.matStart);
+      const t_gk = timeStringToSeconds(repaired.gkStart);
+      const t_cog = timeStringToSeconds(repaired.cografyaStart);
+      const t_vat = timeStringToSeconds(repaired.vatandaslikStart);
+      const t_end = timeStringToSeconds(repaired.examEnd);
+
+      const isValid = (
+        t_start <= t_turkce &&
+        t_turkce < t_mat &&
+        t_mat < t_gk &&
+        t_gk < t_cog &&
+        t_cog < t_vat &&
+        t_vat < t_end
+      );
+
+      if (!isValid) {
+        return { ...DEFAULT_CONFIG, scale: repaired.scale || 100 };
+      }
+      return repaired;
+    }
+
     function calculateScheduleFromStart(startStr) {
       const sSec = timeStringToSeconds(startStr);
       return {
         examStart: startStr,
         turkceStart: startStr,
         matStart: secondsToTimeString(sSec + 40 * 60),        // +40 dk Türkçe
-        gkStart: secondsToTimeString(sSec + 100 * 60),       // +60 dk Matematik (100 dk)
-        cografyaStart: secondsToTimeString(sSec + 115 * 60), // +15 dk Tarih (115 dk)
-        vatandaslikStart: secondsToTimeString(sSec + 125 * 60), // +10 dk Coğrafya (125 dk)
-        examEnd: secondsToTimeString(sSec + 130 * 60)        // +5 dk Vatandaşlık & Güncel (Toplam 130 dk)
+        gkStart: secondsToTimeString(sSec + 100 * 60),       // +60 dk Matematik
+        cografyaStart: secondsToTimeString(sSec + 115 * 60), // +15 dk Tarih
+        vatandaslikStart: secondsToTimeString(sSec + 125 * 60), // +10 dk Coğrafya
+        examEnd: secondsToTimeString(sSec + 130 * 60)        // +5 dk Vatandaşlık (Toplam 130 dk)
       };
     }
 
@@ -1196,23 +1221,15 @@
         const saved = localStorage.getItem('osym_clock_user_config');
         if (saved) {
           const parsed = JSON.parse(saved);
-          config = { ...DEFAULT_CONFIG, ...parsed };
-
-          // Bozulmuş/Uyumsuz saatleri tespit et ve otomatik onar
-          const startSec = timeStringToSeconds(config.examStart);
-          let endSec = timeStringToSeconds(config.examEnd);
-          if (endSec <= startSec || !config.examStart) {
-            console.warn('Uyumsuz prova saati tespit edildi, otomatik onarılıyor...');
-            const fixedSchedule = calculateScheduleFromStart(config.examStart || DEFAULT_CONFIG.examStart);
-            config = { ...config, ...fixedSchedule };
-            saveConfig();
-          }
+          config = validateAndRepairConfig(parsed);
+          saveConfig();
+        } else {
+          config = { ...DEFAULT_CONFIG };
         }
       } catch (e) {
         config = { ...DEFAULT_CONFIG };
       }
 
-      // Prova saniyesini yapılandırmadaki sınav başlangıç saatine senkronize et
       examSeconds = timeStringToSeconds(config.examStart);
       applyConfigToUI();
     }
@@ -1319,7 +1336,7 @@
       }
     }
 
-    // Ses Motoru (iOS Safari Uyumlu)
+    // Ses Motoru
     let audioContext = null;
     function initAudio() {
       if (!audioContext) {
@@ -1411,7 +1428,7 @@
       const examStartSec = timeStringToSeconds(config.examStart);
       let examEndSec = timeStringToSeconds(config.examEnd);
       if (examEndSec <= examStartSec) {
-        examEndSec = examStartSec + 130 * 60; // 130 dakika emniyet kilidi
+        examEndSec = examStartSec + 130 * 60;
       }
 
       const remainingSec = Math.max(0, examEndSec - examSeconds);
@@ -1425,7 +1442,6 @@
       const cSec = timeStringToSeconds(config.cografyaStart);
       const vSec = timeStringToSeconds(config.vatandaslikStart);
 
-      // Hangi bölümde olduğumuzu belirle (Mobilde kısa metinler)
       const isMobile = window.innerWidth <= 480;
 
       if (examSeconds >= examEndSec) {
@@ -1476,6 +1492,7 @@
 
     // Branş Atlama ve Başlatma Fonksiyonu
     function jumpToBranch(timeString, branchKey) {
+      initAudio();
       if (currentMode !== 'exam') {
         setExamMode();
       }
@@ -1484,6 +1501,7 @@
       updatePlayPauseButton();
       updateExamHUD();
       highlightBranchButton(branchKey);
+      triggerTickAudio();
       if (gkDropdownMenu) gkDropdownMenu.classList.remove('show');
     }
 
@@ -1510,7 +1528,6 @@
       const examStartSec = timeStringToSeconds(config.examStart);
       const examEndSec = timeStringToSeconds(config.examEnd);
 
-      // Eğer sınav daha önce bitmişse veya sınav zaman aralığı dışındaysa başlangıç saatine al
       if (examSeconds >= examEndSec || examSeconds < examStartSec) {
         examSeconds = examStartSec;
         isExamRunning = true;
@@ -1549,8 +1566,14 @@
     });
 
     // Branş Buton Olayları
-    btnBranchTurkce.addEventListener('click', () => jumpToBranch(config.turkceStart, 'turkce'));
-    btnBranchMat.addEventListener('click', () => jumpToBranch(config.matStart, 'matematik'));
+    btnBranchTurkce.addEventListener('click', () => {
+      jumpToBranch(config.turkceStart, 'turkce');
+    });
+
+    btnBranchMat.addEventListener('click', () => {
+      jumpToBranch(config.matStart, 'matematik');
+    });
+
     btnBranchGk.addEventListener('click', (e) => {
       if (e.target.closest('#btnBranchGk')) {
         jumpToBranch(config.gkStart, 'gk');
@@ -1564,14 +1587,12 @@
     btnBranchCografyaDirect.addEventListener('click', () => jumpToBranch(config.cografyaStart, 'cografya'));
     btnBranchVatDirect.addEventListener('click', () => jumpToBranch(config.vatandaslikStart, 'vatandaslik'));
 
-    // Sayfa dışı tıklamalarda dropdown kapat
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.dropdown-container')) {
         if (gkDropdownMenu) gkDropdownMenu.classList.remove('show');
       }
     });
 
-    // Sınav Başlangıç Saati değiştiğinde diğer branşları ve bitişi otomatik güncelle
     inpExamStart.addEventListener('change', () => {
       const val = inpExamStart.value;
       if (!val) return;
@@ -1584,7 +1605,6 @@
       inpExamEnd.value = schedule.examEnd;
     });
 
-    // Hızlı Dağıtım Butonları
     btnAutoDistributeTimes.addEventListener('click', () => {
       const val = inpExamStart.value || DEFAULT_CONFIG.examStart;
       const schedule = calculateScheduleFromStart(val);
@@ -1606,7 +1626,6 @@
       inpExamEnd.value = DEFAULT_CONFIG.examEnd;
     });
 
-    // Ayarlar Modalı İşlemleri
     function openSettingsModal() {
       settingsModalBackdrop.classList.add('open');
       applyConfigToUI();
@@ -1625,7 +1644,6 @@
       }
     });
 
-    // Canlı Ölçek Kaydırıcı
     scaleSlider.addEventListener('input', (e) => {
       applyScale(e.target.value);
     });
@@ -1637,31 +1655,30 @@
       });
     });
 
-    // Ayarları Kaydet & Prova Saatini Anında Uygula
     btnSaveSettings.addEventListener('click', () => {
       const startStr = inpExamStart.value || DEFAULT_CONFIG.examStart;
       const startSec = timeStringToSeconds(startStr);
       let endStr = inpExamEnd.value || secondsToTimeString(startSec + 130 * 60);
       let endSec = timeStringToSeconds(endStr);
 
-      // Mantık kontrolü: Bitiş başlangıçtan önce olamaz, en az 130 dakika olmalı
       if (endSec <= startSec) {
         endStr = secondsToTimeString(startSec + 130 * 60);
       }
 
-      config.examStart = startStr;
-      config.turkceStart = inpTurkceStart.value || startStr;
-      config.matStart = inpMatStart.value || secondsToTimeString(startSec + 40 * 60);
-      config.gkStart = inpGkStart.value || secondsToTimeString(startSec + 100 * 60);
-      config.cografyaStart = inpCografyaStart.value || secondsToTimeString(startSec + 115 * 60);
-      config.vatandaslikStart = inpVatandaslikStart.value || secondsToTimeString(startSec + 125 * 60);
-      config.examEnd = endStr;
-      config.scale = parseInt(scaleSlider.value, 10) || 100;
+      config = validateAndRepairConfig({
+        examStart: startStr,
+        turkceStart: inpTurkceStart.value || startStr,
+        matStart: inpMatStart.value || secondsToTimeString(startSec + 40 * 60),
+        gkStart: inpGkStart.value || secondsToTimeString(startSec + 100 * 60),
+        cografyaStart: inpCografyaStart.value || secondsToTimeString(startSec + 115 * 60),
+        vatandaslikStart: inpVatandaslikStart.value || secondsToTimeString(startSec + 125 * 60),
+        examEnd: endStr,
+        scale: parseInt(scaleSlider.value, 10) || 100
+      });
 
       saveConfig();
       applyConfigToUI();
 
-      // Prova saati çalışmasını kaydedilen yeni başlangıç saatine senkronize et
       examSeconds = timeStringToSeconds(config.examStart);
       isExamRunning = true;
       updatePlayPauseButton();
@@ -1670,7 +1687,6 @@
       closeSettingsModal();
     });
 
-    // Ayarları Varsayılana Sıfırla (Temiz Fabrika Reset)
     btnResetSettingsDefault.addEventListener('click', () => {
       if (confirm('Bütün sınav saatlerini ve ölçeği ÖSYM varsayılan KPSS ayarlarına (10:15 - 12:25, 130 Dk) döndürmek istiyor musunuz?')) {
         localStorage.removeItem('osym_clock_user_config');
@@ -1685,7 +1701,6 @@
       }
     });
 
-    // iOS ve Modern Tarayıcı Uyumlu Tam Ekran Motoru
     function isFullscreenActive() {
       return !!(
         document.fullscreenElement ||
@@ -1713,7 +1728,6 @@
             document.body.classList.add('is-fullscreen');
             updateFullscreenButton();
           }).catch(() => {
-            // iOS Safari fallback
             document.body.classList.add('is-fullscreen');
             updateFullscreenButton();
           });
@@ -1724,7 +1738,6 @@
           document.body.classList.add('is-fullscreen');
           updateFullscreenButton();
         } else {
-          // iPhone Safari: Görsel tam ekran
           document.body.classList.add('is-fullscreen');
           updateFullscreenButton();
         }
@@ -1770,7 +1783,6 @@
       updateFullscreenButton();
     });
 
-    // Otomatik Kontrol Gizleme (Idle) & Boş Alana Dokunma ile Gizleme
     let idleTimeout = null;
     function resetIdleTimer() {
       clearTimeout(idleTimeout);
@@ -1793,7 +1805,6 @@
 
     window.addEventListener('mousemove', showControls);
 
-    // Ekrana dokunulduğunda: Butonlara tıklanmadıysa kontrolleri aç/kapat (toggle)
     document.body.addEventListener('click', (e) => {
       if (e.target.closest('#controlsContainer') || e.target.closest('.modal-backdrop') || e.target.closest('.top-hud')) {
         resetIdleTimer();
