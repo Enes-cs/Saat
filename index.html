@@ -352,7 +352,6 @@
         gap: 4px;
       }
 
-      /* Ana Buton Çubuğu: 4 butonu 375px genişliğe tam sığdırır */
       #mainControlsRow {
         flex-wrap: nowrap;
         justify-content: space-between;
@@ -366,7 +365,6 @@
         font-size: 11px;
       }
 
-      /* Branş Butonları Çubuğu: Yatay Kaydırılabilir Çipler */
       #branchControlsRow {
         flex-wrap: nowrap;
         overflow-x: auto;
@@ -388,7 +386,6 @@
         border-radius: 20px;
       }
 
-      /* Prova Saati İşlem Kontrolleri */
       #examControlsRow {
         flex-wrap: nowrap;
         justify-content: center;
@@ -619,7 +616,6 @@
       justify-content: space-between;
     }
 
-    /* iOS Safari 16px font-size: Otomatik zoomu engeller */
     .setting-item input[type="time"] {
       background: rgba(15, 23, 42, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -642,7 +638,6 @@
       box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
     }
 
-    /* Mobil Ayarlar Düzeni (iPhone SE) */
     @media (max-width: 480px) {
       .modal-card {
         padding: 16px 14px;
@@ -667,7 +662,8 @@
       }
 
       .setting-item input[type="time"] {
-        width: 108px;
+        min-width: 110px;
+        width: 110px;
         padding: 4px 6px;
         min-height: 34px;
       }
@@ -747,6 +743,17 @@
 
     .btn-preset:hover, .btn-preset:active {
       background: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+    }
+
+    .btn-preset.primary {
+      background: rgba(37, 99, 235, 0.25);
+      border-color: rgba(96, 165, 250, 0.4);
+      color: #93c5fd;
+    }
+
+    .btn-preset.primary:hover {
+      background: rgba(37, 99, 235, 0.45);
       color: #ffffff;
     }
 
@@ -955,16 +962,16 @@
     <!-- Ana Mod ve Araç Çubuğu -->
     <div id="mainControlsRow" class="control-row">
       <button id="btnModeReal" class="c-btn active" title="Gerçek Saat">
-        <span>🕒 Canlı</span>
+        <span>🕒 Gerçek Saat</span>
       </button>
       <button id="btnModeExam" class="c-btn" title="KPSS Prova Saati Modu">
-        <span>📝 Prova</span>
+        <span>📝 Prova Saati</span>
       </button>
       <button id="btnOpenSettings" class="c-btn" title="Saatleri ve Boyutu Ayarla">
-        <span>⚙️ Ayar</span>
+        <span>⚙️ Ayarlar</span>
       </button>
       <button id="btnFullscreenToggle" class="c-btn" title="Tam Ekran (F)">
-        <span>⛶ Ekran</span>
+        <span>⛶ Tam Ekran</span>
       </button>
     </div>
 
@@ -980,7 +987,7 @@
       <!-- Genel Kültür Açılır Menü Butonu -->
       <div class="dropdown-container">
         <button id="btnBranchGk" class="c-btn btn-branch gk" title="Genel Kültür Bölümünü Başlat">
-          <span>🏛️ GK (<span class="lbl-time-gk">11:55</span>) ▾</span>
+          <span>🏛️ Genel Kültür (<span class="lbl-time-gk">11:55</span>) ▾</span>
         </button>
         <div id="gkDropdownMenu" class="dropdown-menu">
           <button class="dropdown-item" id="btnSubTarih">
@@ -1013,7 +1020,7 @@
         <span id="txtPlayPause">⏸️ Duraklat</span>
       </button>
       <button id="btnResetExam" class="c-btn" title="Sınav Başlangıcına Sıfırla">
-        <span>🔄 Başa Al</span>
+        <span>🔄 Başa Al (<span class="lbl-time-start">10:15</span>)</span>
       </button>
       <button id="btnToggleSound" class="c-btn" title="Saniye Tik-Tak Sesi">
         <span id="txtSound">🔇 Ses: Kapalı</span>
@@ -1050,9 +1057,16 @@
       <!-- 2. Bölüm ve Branş Saatleri Ayarı -->
       <div class="modal-section">
         <div class="modal-section-title">🕒 Branş ve Sınav Saatleri</div>
+        
+        <!-- Hızlı Dağıtım Butonları -->
+        <div style="display: flex; gap: 6px; margin-bottom: 10px;">
+          <button type="button" id="btnOsymStandardTimes" class="btn-preset primary" style="flex: 1; padding: 7px 4px;">🏛️ ÖSYM Standart (10:15)</button>
+          <button type="button" id="btnAutoDistributeTimes" class="btn-preset" style="flex: 1; padding: 7px 4px;">⚡ 130 Dk Otomatik Dağıt</button>
+        </div>
+
         <div class="settings-grid">
-          <div class="setting-item">
-            <label for="inpExamStart">Sınav Başlangıç:</label>
+          <div class="setting-item" style="border-color: rgba(59, 130, 246, 0.35); background: rgba(37, 99, 235, 0.08);">
+            <label for="inpExamStart"><strong>🏁 Sınav Başlangıç:</strong></label>
             <input type="time" id="inpExamStart" value="10:15">
           </div>
 
@@ -1081,8 +1095,8 @@
             <input type="time" id="inpVatandaslikStart" value="12:20">
           </div>
 
-          <div class="setting-item">
-            <label for="inpExamEnd">🏁 Sınav Bitiş Saati:</label>
+          <div class="setting-item" style="grid-column: 1 / -1; border-color: rgba(239, 68, 68, 0.35); background: rgba(239, 68, 68, 0.08);">
+            <label for="inpExamEnd"><strong>🏁 Sınav Bitiş (130 Dk):</strong></label>
             <input type="time" id="inpExamEnd" value="12:25">
           </div>
         </div>
@@ -1090,8 +1104,8 @@
 
       <!-- Butonlar -->
       <div class="modal-actions">
-        <button id="btnSaveSettings" class="btn-save-settings">💾 Kaydet</button>
-        <button id="btnResetSettingsDefault" class="btn-reset-settings">🔄 Sıfırla</button>
+        <button id="btnSaveSettings" class="btn-save-settings">💾 Ayarları Kaydet & Başlat</button>
+        <button id="btnResetSettingsDefault" class="btn-reset-settings" title="ÖSYM 10:15 standart ayarlarına döndür">🔄 Varsayılana Dön</button>
       </div>
     </div>
   </div>
@@ -1132,7 +1146,7 @@
       numbersGroup.appendChild(text);
     }
 
-    // 2. Varsayılan Ayarlar & Konfigürasyon
+    // 2. Varsayılan Ayarlar & Konfigürasyon (ÖSYM KPSS 130 Dakika)
     const DEFAULT_CONFIG = {
       scale: 100,
       examStart: '10:15',
@@ -1146,16 +1160,60 @@
 
     let config = { ...DEFAULT_CONFIG };
 
+    function timeStringToSeconds(tStr) {
+      if (!tStr || typeof tStr !== 'string') return 0;
+      const parts = tStr.split(':');
+      const h = parseInt(parts[0], 10) || 0;
+      const m = parseInt(parts, 10) || 0;
+      const s = parseInt(parts[2], 10) || 0;
+      return h * 3600 + m * 60 + s;
+    }
+
+    function secondsToTimeString(sec) {
+      sec = Math.round(sec) % 86400;
+      if (sec < 0) sec += 86400;
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+    }
+
+    // Sınav başlangıç saatine göre branşları standart 130 dakikalık KPSS akışına otomatik dağıt
+    function calculateScheduleFromStart(startStr) {
+      const sSec = timeStringToSeconds(startStr);
+      return {
+        examStart: startStr,
+        turkceStart: startStr,
+        matStart: secondsToTimeString(sSec + 40 * 60),        // +40 dk Türkçe
+        gkStart: secondsToTimeString(sSec + 100 * 60),       // +60 dk Matematik (100 dk)
+        cografyaStart: secondsToTimeString(sSec + 115 * 60), // +15 dk Tarih (115 dk)
+        vatandaslikStart: secondsToTimeString(sSec + 125 * 60), // +10 dk Coğrafya (125 dk)
+        examEnd: secondsToTimeString(sSec + 130 * 60)        // +5 dk Vatandaşlık & Güncel (Toplam 130 dk)
+      };
+    }
+
     function loadSavedConfig() {
       try {
         const saved = localStorage.getItem('osym_clock_user_config');
         if (saved) {
           const parsed = JSON.parse(saved);
           config = { ...DEFAULT_CONFIG, ...parsed };
+
+          // Bozulmuş/Uyumsuz saatleri tespit et ve otomatik onar
+          const startSec = timeStringToSeconds(config.examStart);
+          let endSec = timeStringToSeconds(config.examEnd);
+          if (endSec <= startSec || !config.examStart) {
+            console.warn('Uyumsuz prova saati tespit edildi, otomatik onarılıyor...');
+            const fixedSchedule = calculateScheduleFromStart(config.examStart || DEFAULT_CONFIG.examStart);
+            config = { ...config, ...fixedSchedule };
+            saveConfig();
+          }
         }
       } catch (e) {
         config = { ...DEFAULT_CONFIG };
       }
+
+      // Prova saniyesini yapılandırmadaki sınav başlangıç saatine senkronize et
+      examSeconds = timeStringToSeconds(config.examStart);
       applyConfigToUI();
     }
 
@@ -1165,28 +1223,13 @@
       } catch (e) {}
     }
 
-    function timeStringToSeconds(tStr) {
-      if (!tStr) return 0;
-      const parts = tStr.split(':');
-      const h = parseInt(parts[0], 10) || 0;
-      const m = parseInt(parts, 10) || 0;
-      const s = parseInt(parts[2], 10) || 0;
-      return h * 3600 + m * 60 + s;
-    }
-
-    function secondsToTimeString(sec) {
-      const h = Math.floor(sec / 3600);
-      const m = Math.floor((sec % 3600) / 60);
-      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-    }
-
     // 3. Çalışma Durumu Değişkenleri
     let currentMode = 'real'; // 'real' | 'exam'
     let isExamRunning = true;
     let isSoundOn = false;
     let activeBranchKey = 'turkce';
 
-    let examSeconds = timeStringToSeconds(config.examStart);
+    let examSeconds = timeStringToSeconds(DEFAULT_CONFIG.examStart);
     let lastTimestamp = performance.now();
     let lastSecondTick = -1;
 
@@ -1230,6 +1273,8 @@
     const btnCloseSettingsX = document.getElementById('btnCloseSettingsX');
     const btnSaveSettings = document.getElementById('btnSaveSettings');
     const btnResetSettingsDefault = document.getElementById('btnResetSettingsDefault');
+    const btnOsymStandardTimes = document.getElementById('btnOsymStandardTimes');
+    const btnAutoDistributeTimes = document.getElementById('btnAutoDistributeTimes');
 
     const scaleSlider = document.getElementById('scaleSlider');
     const scaleValueBadge = document.getElementById('scaleValueBadge');
@@ -1253,6 +1298,7 @@
       applyScale(config.scale);
 
       // Butonlardaki saat etiketlerini güncelle
+      document.querySelectorAll('.lbl-time-start').forEach(el => el.textContent = config.examStart);
       document.querySelectorAll('.lbl-time-turkce').forEach(el => el.textContent = config.turkceStart);
       document.querySelectorAll('.lbl-time-mat').forEach(el => el.textContent = config.matStart);
       document.querySelectorAll('.lbl-time-gk').forEach(el => el.textContent = config.gkStart);
@@ -1308,7 +1354,7 @@
 
     // Render Döngüsü
     function render(now) {
-      const delta = (now - lastTimestamp) / 1000;
+      const delta = Math.min((now - lastTimestamp) / 1000, 1.0);
       lastTimestamp = now;
 
       let h, m, s;
@@ -1362,7 +1408,12 @@
 
     // HUD ve Kalan Süre Güncelleme
     function updateExamHUD() {
-      const examEndSec = timeStringToSeconds(config.examEnd);
+      const examStartSec = timeStringToSeconds(config.examStart);
+      let examEndSec = timeStringToSeconds(config.examEnd);
+      if (examEndSec <= examStartSec) {
+        examEndSec = examStartSec + 130 * 60; // 130 dakika emniyet kilidi
+      }
+
       const remainingSec = Math.max(0, examEndSec - examSeconds);
       const remMins = Math.floor(remainingSec / 60);
       const remSecs = Math.floor(remainingSec % 60);
@@ -1454,7 +1505,18 @@
       examControlsRow.style.display = 'flex';
       branchControlsRow.style.display = 'flex';
       examSectionWrapper.style.display = 'inline-flex';
-      modeDisplayLabel.textContent = window.innerWidth <= 480 ? '📝 Prova' : '📝 KPSS Prova';
+      modeDisplayLabel.textContent = window.innerWidth <= 480 ? '📝 Prova Saati' : '📝 KPSS Prova Saati';
+
+      const examStartSec = timeStringToSeconds(config.examStart);
+      const examEndSec = timeStringToSeconds(config.examEnd);
+
+      // Eğer sınav daha önce bitmişse veya sınav zaman aralığı dışındaysa başlangıç saatine al
+      if (examSeconds >= examEndSec || examSeconds < examStartSec) {
+        examSeconds = examStartSec;
+        isExamRunning = true;
+      }
+
+      updatePlayPauseButton();
       updateExamHUD();
     }
 
@@ -1509,6 +1571,41 @@
       }
     });
 
+    // Sınav Başlangıç Saati değiştiğinde diğer branşları ve bitişi otomatik güncelle
+    inpExamStart.addEventListener('change', () => {
+      const val = inpExamStart.value;
+      if (!val) return;
+      const schedule = calculateScheduleFromStart(val);
+      inpTurkceStart.value = schedule.turkceStart;
+      inpMatStart.value = schedule.matStart;
+      inpGkStart.value = schedule.gkStart;
+      inpCografyaStart.value = schedule.cografyaStart;
+      inpVatandaslikStart.value = schedule.vatandaslikStart;
+      inpExamEnd.value = schedule.examEnd;
+    });
+
+    // Hızlı Dağıtım Butonları
+    btnAutoDistributeTimes.addEventListener('click', () => {
+      const val = inpExamStart.value || DEFAULT_CONFIG.examStart;
+      const schedule = calculateScheduleFromStart(val);
+      inpTurkceStart.value = schedule.turkceStart;
+      inpMatStart.value = schedule.matStart;
+      inpGkStart.value = schedule.gkStart;
+      inpCografyaStart.value = schedule.cografyaStart;
+      inpVatandaslikStart.value = schedule.vatandaslikStart;
+      inpExamEnd.value = schedule.examEnd;
+    });
+
+    btnOsymStandardTimes.addEventListener('click', () => {
+      inpExamStart.value = DEFAULT_CONFIG.examStart;
+      inpTurkceStart.value = DEFAULT_CONFIG.turkceStart;
+      inpMatStart.value = DEFAULT_CONFIG.matStart;
+      inpGkStart.value = DEFAULT_CONFIG.gkStart;
+      inpCografyaStart.value = DEFAULT_CONFIG.cografyaStart;
+      inpVatandaslikStart.value = DEFAULT_CONFIG.vatandaslikStart;
+      inpExamEnd.value = DEFAULT_CONFIG.examEnd;
+    });
+
     // Ayarlar Modalı İşlemleri
     function openSettingsModal() {
       settingsModalBackdrop.classList.add('open');
@@ -1533,35 +1630,58 @@
       applyScale(e.target.value);
     });
 
-    document.querySelectorAll('.btn-preset').forEach(btn => {
+    document.querySelectorAll('.btn-preset[data-scale]').forEach(btn => {
       btn.addEventListener('click', () => {
         const val = btn.getAttribute('data-scale');
         applyScale(val);
       });
     });
 
-    // Ayarları Kaydet
+    // Ayarları Kaydet & Prova Saatini Anında Uygula
     btnSaveSettings.addEventListener('click', () => {
-      config.examStart = inpExamStart.value || DEFAULT_CONFIG.examStart;
-      config.turkceStart = inpTurkceStart.value || DEFAULT_CONFIG.turkceStart;
-      config.matStart = inpMatStart.value || DEFAULT_CONFIG.matStart;
-      config.gkStart = inpGkStart.value || DEFAULT_CONFIG.gkStart;
-      config.cografyaStart = inpCografyaStart.value || DEFAULT_CONFIG.cografyaStart;
-      config.vatandaslikStart = inpVatandaslikStart.value || DEFAULT_CONFIG.vatandaslikStart;
-      config.examEnd = inpExamEnd.value || DEFAULT_CONFIG.examEnd;
+      const startStr = inpExamStart.value || DEFAULT_CONFIG.examStart;
+      const startSec = timeStringToSeconds(startStr);
+      let endStr = inpExamEnd.value || secondsToTimeString(startSec + 130 * 60);
+      let endSec = timeStringToSeconds(endStr);
+
+      // Mantık kontrolü: Bitiş başlangıçtan önce olamaz, en az 130 dakika olmalı
+      if (endSec <= startSec) {
+        endStr = secondsToTimeString(startSec + 130 * 60);
+      }
+
+      config.examStart = startStr;
+      config.turkceStart = inpTurkceStart.value || startStr;
+      config.matStart = inpMatStart.value || secondsToTimeString(startSec + 40 * 60);
+      config.gkStart = inpGkStart.value || secondsToTimeString(startSec + 100 * 60);
+      config.cografyaStart = inpCografyaStart.value || secondsToTimeString(startSec + 115 * 60);
+      config.vatandaslikStart = inpVatandaslikStart.value || secondsToTimeString(startSec + 125 * 60);
+      config.examEnd = endStr;
       config.scale = parseInt(scaleSlider.value, 10) || 100;
 
       saveConfig();
       applyConfigToUI();
+
+      // Prova saati çalışmasını kaydedilen yeni başlangıç saatine senkronize et
+      examSeconds = timeStringToSeconds(config.examStart);
+      isExamRunning = true;
+      updatePlayPauseButton();
+      updateExamHUD();
+
       closeSettingsModal();
     });
 
-    // Ayarları Varsayılana Sıfırla
+    // Ayarları Varsayılana Sıfırla (Temiz Fabrika Reset)
     btnResetSettingsDefault.addEventListener('click', () => {
-      if (confirm('Bütün saatleri ve ölçeği varsayılan KPSS ayarlarına döndürmek istiyor musunuz?')) {
+      if (confirm('Bütün sınav saatlerini ve ölçeği ÖSYM varsayılan KPSS ayarlarına (10:15 - 12:25, 130 Dk) döndürmek istiyor musunuz?')) {
+        localStorage.removeItem('osym_clock_user_config');
         config = { ...DEFAULT_CONFIG };
         saveConfig();
         applyConfigToUI();
+        examSeconds = timeStringToSeconds(config.examStart);
+        isExamRunning = true;
+        updatePlayPauseButton();
+        updateExamHUD();
+        closeSettingsModal();
       }
     });
 
@@ -1581,7 +1701,7 @@
         btnFullscreenToggle.innerHTML = '<span>✕ Küçült</span>';
       } else {
         btnFullscreenToggle.classList.remove('active');
-        btnFullscreenToggle.innerHTML = '<span>⛶ Ekran</span>';
+        btnFullscreenToggle.innerHTML = '<span>⛶ Tam Ekran</span>';
       }
     }
 
@@ -1716,7 +1836,7 @@
       if (currentMode === 'real') {
         modeDisplayLabel.textContent = window.innerWidth <= 480 ? '🕒 Canlı' : '🕒 Canlı Gerçek Saat';
       } else {
-        modeDisplayLabel.textContent = window.innerWidth <= 480 ? '📝 Prova' : '📝 KPSS Prova';
+        modeDisplayLabel.textContent = window.innerWidth <= 480 ? '📝 Prova Saati' : '📝 KPSS Prova Saati';
       }
       if (currentMode === 'exam') {
         updateExamHUD();
