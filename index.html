@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ÖSYM KPSS Önlisans Duvar Saati & Prova Saati</title>
+  <style>
+    :root {
+      --wall-tone-1: #253342;
+      --wall-tone-2: #141c26;
+      --clock-scale: 1.0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(circle at 50% 45%, var(--wall-tone-1) 0%, var(--wall-tone-2) 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at 50% 30%, rgba(255, 255, 255, 0.04) 0%, rgba(0, 0, 0, 0.45) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Saat Alanı ve Ölçeklendirme */
+    #clock-wrapper {
+      position: relative;
+      width: min(64vw, 64vh);
+      height: min(64vw, 64vh);
+      max-width: 560px;
+      max-height: 560px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2;
+      transform: scale(var(--clock-scale));
+      transform-origin: center center;
+      transition: width 0.35s ease, height 0.35s ease, max-width 0.35s ease, max-height 0.35s ease, transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      filter: drop-shadow(0 25px 45px rgba(0, 0, 0, 0.65)) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+    }
+
+    :fullscreen #clock-wrapper,
+    :-webkit-full-screen #clock-wrapper,
+    .is-fullscreen #clock-wrapper {
+      width: min(94vw, 94vh);
+      height: min(94vw, 94vh);
+      max-width: 950px;
+      max-height: 950px;
+    }
+
+    svg#clock-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+    }
+
+    /* Üst Durum Göstergesi (HUD) */
+    .top-hud {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 40px;
+      padding: 8px 22px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #f1f5f9;
+      font-size: 13.5px;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      z-index: 20;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      white-space: nowrap;
+    }
+
+    .top-hud.hidden {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-20px);
+      pointer-events: none;
+    }
+
+    .hud-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 12.5px;
+      letter-spacing: 0.3px;
+      transition: all 0.25s ease;
+    }
+
+    .hud-pill.turkce { background: rgba(2, 132, 199, 0.22); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.45); }
+    .hud-pill.matematik { background: rgba(22, 163, 74, 0.22); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.45); }
+    .hud-pill.gk { background: rgba(147, 51, 234, 0.22); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.45); }
+    .hud-pill.tarih { background: rgba(168, 85, 247, 0.22); color: #d8b4fe; border: 1px solid rgba(216, 180, 254, 0.45); }
+    .hud-pill.cografya { background: rgba(245, 158, 11, 0.22); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.45); }
+    .hud-pill.vatandaslik { background: rgba(236, 72, 153, 0.22); color: #f472b6; border: 1px solid rgba(244, 114, 182, 0.45); }
+    .hud-pill.bitti { background: rgba(239, 68, 68, 0.25); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.5); }
+
+    .hud-time {
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      color: #f59e0b;
+      font-size: 15px;
+    }
+
+    /* Alt Kontrol Paneli */
+    .controls-container {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      z-index: 20;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      max-width: 98vw;
+    }
+
+    .controls-container.hidden {
+      opacity: 0;
+      transform: translateX(-50%) translateY(20px);
+      pointer-events: none;
+    }
+
+    .control-row {
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .c-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #f8fafc;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 6.5px 13px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+    }
+
+    .c-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .c-btn:active { transform: translateY(1px); }
+
+    .c-btn.active {
+      background: #2563eb;
+      border-color: #60a5fa;
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(37, 99, 235, 0.45);
+    }
+
+    .c-btn.btn-play.active {
+      background: #16a34a;
+      border-color: #4ade80;
+      box-shadow: 0 0 14px rgba(22, 163, 74, 0.45);
+    }
+
+    .c-btn.btn-branch {
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: #e2e8f0;
+      font-size: 12px;
+      padding: 6px 11px;
+    }
+
+    .c-btn.btn-branch:hover {
+      background: rgba(51, 65, 85, 0.95);
+      border-color: rgba(148, 163, 184, 0.5);
+    }
+
+    .c-btn.btn-branch.active-branch {
+      background: #3b82f6;
+      border-color: #93c5fd;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+    }
+
+    .c-btn.btn-branch.mat.active-branch {
+      background: #16a34a;
+      border-color: #86efac;
+      box-shadow: 0 0 12px rgba(22, 163, 74, 0.5);
+    }
+
+    .c-btn.btn-branch.gk.active-branch {
+      background: #8b5cf6;
+      border-color: #c4b5fd;
+      box-shadow: 0 0 12px rgba(139, 92, 246, 0.5);
+    }
+
+    .c-btn.btn-branch.cog.active-branch {
+      background: #d97706;
+      border-color: #fcd34d;
+      box-shadow: 0 0 12px rgba(217, 119, 6, 0.5);
+    }
+
+    .c-btn.btn-branch.vat.active-branch {
+      background: #db2777;
+      border-color: #f472b6;
+      box-shadow: 0 0 12px rgba(219, 39, 119, 0.5);
+    }
+
+    /* Dropdown Menü (Genel Kültür Alt Dalları) */
+    .dropdown-container {
+      position: relative;
+      display: inline-flex;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 14px;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 210px;
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.65);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 35;
+    }
+
+    .dropdown-menu.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 12px;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      color: #f1f5f9;
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .dropdown-item .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+    }
+
+    /* Ayarlar Modalı */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      width: 92vw;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+      color: #f8fafc;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+      transform: scale(0.95);
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .modal-backdrop.open .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+    }
+
+    .modal-header h2 {
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #f1f5f9;
+    }
+
+    .btn-close-modal {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 22px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+      border-radius: 6px;
+      transition: color 0.15s;
+    }
+
+    .btn-close-modal:hover { color: #f8fafc; }
+
+    .modal-section {
+      margin-bottom: 20px;
+    }
+
+    .modal-section-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #60a5fa;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 480px) {
+      .settings-grid { grid-template-columns: 1fr; }
+    }
+
+    .setting-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .setting-item label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .setting-item input[type="time"] {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #f8fafc;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .setting-item input[type="time"]:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+    }
+
+    /* Ölçek Kaydırıcı */
+    .scale-control-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .scale-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    .scale-value-badge {
+      background: #2563eb;
+      color: #ffffff;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .scale-slider {
+      width: 100%;
+      height: 6px;
+      background: #334155;
+      border-radius: 4px;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .scale-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      background: #60a5fa;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(37, 99, 235, 0.6);
+      cursor: pointer;
+    }
+
+    .scale-presets {
+      display: flex;
+      gap: 6px;
+      justify-content: space-between;
+    }
+
+    .btn-preset {
+      flex: 1;
+      padding: 5px 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+
+    .btn-preset:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 16px;
+    }
+
+    .btn-save-settings {
+      flex: 2;
+      background: #2563eb;
+      border: 1px solid #60a5fa;
+      color: #ffffff;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+      transition: all 0.2s;
+    }
+
+    .btn-save-settings:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+
+    .btn-reset-settings {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #cbd5e1;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-reset-settings:hover {
+      background: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+    }
+
+    .screen-hint {
+      position: fixed;
+      bottom: 4px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.3);
+      pointer-events: none;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Üst Bilgi Barı (HUD) -->
+  <div id="topHud" class="top-hud">
+    <span id="modeDisplayLabel">🕒 Canlı Gerçek Saat</span>
+    <span id="examSectionWrapper" style="display: none;">
+      | <span id="examSectionPill" class="hud-pill turkce">Türkçe</span>
+      | Kalan: <span id="kalanSureTimer" class="hud-time">130:00</span>
+    </span>
+  </div>
+
+  <!-- Saat SVG -->
+  <div id="clock-wrapper">
+    <svg id="clock-svg" viewBox="-300 -300 600 600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <defs>
+        <!-- Krom/Gümüş Dış Çerçeve Degradesi -->
+        <linearGradient id="metalBezelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ffffff" />
+          <stop offset="15%" stop-color="#e2e8f0" />
+          <stop offset="45%" stop-color="#94a3b8" />
+          <stop offset="75%" stop-color="#f1f5f9" />
+          <stop offset="90%" stop-color="#64748b" />
+          <stop offset="100%" stop-color="#cbd5e1" />
+        </linearGradient>
+
+        <radialGradient id="bevelShade" cx="30%" cy="25%" r="75%">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8" />
+          <stop offset="50%" stop-color="#64748b" stop-opacity="0.1" />
+          <stop offset="90%" stop-color="#0f172a" stop-opacity="0.5" />
+          <stop offset="100%" stop-color="#020617" stop-opacity="0.8" />
+        </radialGradient>
+
+        <!-- İncelmiş Normal İç Siyah Halka -->
+        <radialGradient id="innerDarkBezel" cx="50%" cy="50%" r="50%">
+          <stop offset="88%" stop-color="#242c38" />
+          <stop offset="96%" stop-color="#111827" />
+          <stop offset="100%" stop-color="#030712" />
+        </radialGradient>
+
+        <!-- Sıcak Fildişi Kadran Zemin Degradesi -->
+        <radialGradient id="dialGradient" cx="48%" cy="45%" r="60%">
+          <stop offset="0%" stop-color="#faf9f3" />
+          <stop offset="70%" stop-color="#f5f3eb" />
+          <stop offset="100%" stop-color="#ebe8dc" />
+        </radialGradient>
+
+        <!-- İnce Cam Yansıması -->
+        <linearGradient id="glassSheen" x1="15%" y1="0%" x2="85%" y2="100%">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.15" />
+          <stop offset="35%" stop-color="#ffffff" stop-opacity="0.04" />
+          <stop offset="55%" stop-color="#ffffff" stop-opacity="0.0" />
+          <stop offset="100%" stop-color="#000000" stop-opacity="0.07" />
+        </linearGradient>
+
+        <!-- Kollar İçin Doğal Gölge -->
+        <filter id="shadowFilter" x="-20%" y="-20%" width="150%" height="150%">
+          <feDropShadow dx="2" dy="5" stdDeviation="3.5" flood-color="#000000" flood-opacity="0.38" />
+        </filter>
+        <filter id="secondShadowFilter" x="-30%" y="-30%" width="170%" height="170%">
+          <feDropShadow dx="1.5" dy="3.5" stdDeviation="2.5" flood-color="#000000" flood-opacity="0.45" />
+        </filter>
+      </defs>
+
+      <!-- 1. Dış Metalik Krom Çerçeve -->
+      <circle r="294" fill="url(#metalBezelGrad)" />
+      <circle r="294" fill="url(#bevelShade)" />
+      <circle r="294" fill="none" stroke="#475569" stroke-width="1.5" />
+      <circle r="278" fill="none" stroke="#ffffff" stroke-width="1.2" stroke-opacity="0.5" />
+
+      <!-- 2. İncelmiş Normal İç Siyah Halka -->
+      <circle r="270" fill="url(#innerDarkBezel)" />
+      <circle r="270" fill="none" stroke="#000000" stroke-width="2" />
+
+      <!-- 3. Kadran Zemini -->
+      <circle r="256" fill="url(#dialGradient)" />
+      <circle r="256" fill="none" stroke="#23272d" stroke-width="1.8" />
+      <circle r="254" fill="none" stroke="#d5d0c4" stroke-width="1" />
+
+      <!-- Dış Dakika Çemberi -->
+      <circle r="248" fill="none" stroke="#333333" stroke-width="1.2" />
+
+      <!-- 60 Dakika & Saat Çizgileri -->
+      <g id="svgTicksGroup"></g>
+
+      <!-- ÖSYM Logosu -->
+      <image 
+        href="https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/%C3%96SYM.svg/1280px-%C3%96SYM.svg.png?utm_source=tr.wikipedia.org&utm_campaign=index&utm_content=thumbnail"
+        xlink:href="https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/%C3%96SYM.svg/1280px-%C3%96SYM.svg.png?utm_source=tr.wikipedia.org&utm_campaign=index&utm_content=thumbnail"
+        x="-78" y="-118" width="156" height="54"
+        preserveAspectRatio="xMidYMid meet"
+      />
+
+      <!-- 1 - 12 Rakamları -->
+      <g id="svgNumbersGroup" font-family="'Arial Black', 'Impact', 'Trebuchet MS', sans-serif" font-weight="900" font-size="46" fill="#18181b" text-anchor="middle" dominant-baseline="central"></g>
+
+      <!-- İnce Cam Parlaması -->
+      <circle r="256" fill="url(#glassSheen)" pointer-events="none" />
+
+      <!-- Kollar -->
+      <!-- Akrep -->
+      <g id="svgHourHand" filter="url(#shadowFilter)">
+        <path d="M -7.5 22 L -6.5 -125 L 0 -150 L 6.5 -125 L 7.5 22 L 0 30 Z" fill="#111827" />
+        <line x1="0" y1="-146" x2="0" y2="26" stroke="#374151" stroke-width="1.2" />
+      </g>
+
+      <!-- Yelkovan -->
+      <g id="svgMinuteHand" filter="url(#shadowFilter)">
+        <path d="M -5.5 28 L -4.5 -210 L 0 -240 L 4.5 -210 L 5.5 28 L 0 36 Z" fill="#0f172a" />
+        <line x1="0" y1="-236" x2="0" y2="32" stroke="#334155" stroke-width="1" />
+      </g>
+
+      <!-- Kırmızı Saniye İbresi -->
+      <g id="svgSecondHand" filter="url(#secondShadowFilter)">
+        <line x1="0" y1="0" x2="0" y2="-242" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" />
+        <rect x="-4.5" y="18" width="9" height="38" fill="#b91c1c" rx="1" />
+        <line x1="0" y1="0" x2="0" y2="64" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" />
+        <circle cx="0" cy="0" r="4.5" fill="#dc2626" />
+      </g>
+
+      <!-- Pirinç Göbek Vidası -->
+      <circle cx="0" cy="0" r="7.5" fill="#0f172a" />
+      <circle cx="0" cy="0" r="4.2" fill="#d4af37" />
+      <circle cx="0" cy="0" r="1.5" fill="#18181b" />
+    </svg>
+  </div>
+
+  <!-- Alt Kontrol Paneli -->
+  <div id="controlsContainer" class="controls-container">
+    <!-- Ana Mod ve Araç Çubuğu -->
+    <div class="control-row">
+      <button id="btnModeReal" class="c-btn active" title="Gerçek Saat">
+        <span>🕒 Gerçek Saat</span>
+      </button>
+      <button id="btnModeExam" class="c-btn" title="KPSS Prova Saati Modu">
+        <span>📝 Prova Saati</span>
+      </button>
+      <button id="btnOpenSettings" class="c-btn" title="Saatleri ve Boyutu Ayarla">
+        <span>⚙️ Ayarlar</span>
+      </button>
+      <button id="btnFullscreenToggle" class="c-btn" title="Tam Ekran (F)">
+        <span>⛶ Tam Ekran</span>
+      </button>
+    </div>
+
+    <!-- Hızlı Branş / Bölüm Seçici Çubuğu (Prova Modu Açıkken Aktif) -->
+    <div id="branchControlsRow" class="control-row" style="display: none;">
+      <button id="btnBranchTurkce" class="c-btn btn-branch" title="Türkçe Branşına Başla">
+        <span>📖 Türkçe (<span class="lbl-time-turkce">10:15</span>)</span>
+      </button>
+      <button id="btnBranchMat" class="c-btn btn-branch mat" title="Matematik Branşına Başla">
+        <span>📐 Matematik (<span class="lbl-time-mat">10:55</span>)</span>
+      </button>
+
+      <!-- Genel Kültür Açılır Menü Butonu -->
+      <div class="dropdown-container">
+        <button id="btnBranchGk" class="c-btn btn-branch gk" title="Genel Kültür Bölümünü Başlat">
+          <span>🏛️ Genel Kültür (<span class="lbl-time-gk">11:55</span>) ▾</span>
+        </button>
+        <div id="gkDropdownMenu" class="dropdown-menu">
+          <button class="dropdown-item" id="btnSubTarih">
+            <span>📜 Tarih / GK</span>
+            <span class="badge lbl-time-gk">11:55</span>
+          </button>
+          <button class="dropdown-item" id="btnSubCografya">
+            <span>🗺️ Coğrafya</span>
+            <span class="badge lbl-time-cografya">12:10</span>
+          </button>
+          <button class="dropdown-item" id="btnSubVatandaslik">
+            <span>⚖️ Vatandaşlık & Güncel</span>
+            <span class="badge lbl-time-vatandaslik">12:20</span>
+          </button>
+        </div>
+      </div>
+
+      <button id="btnBranchCografyaDirect" class="c-btn btn-branch cog" title="Doğrudan Coğrafya Başlat">
+        <span>🗺️ Coğrafya (<span class="lbl-time-cografya">12:10</span>)</span>
+      </button>
+
+      <button id="btnBranchVatDirect" class="c-btn btn-branch vat" title="Doğrudan Vatandaşlık & Güncel Başlat">
+        <span>⚖️ Vatandaşlık (<span class="lbl-time-vatandaslik">12:20</span>)</span>
+      </button>
+    </div>
+
+    <!-- Prova Saati İşlem Kontrolleri -->
+    <div id="examControlsRow" class="control-row" style="display: none;">
+      <button id="btnPlayPause" class="c-btn btn-play active">
+        <span id="txtPlayPause">⏸️ Duraklat</span>
+      </button>
+      <button id="btnResetExam" class="c-btn" title="Sınav Başlangıcına Sıfırla">
+        <span>🔄 Başa Sıfırla</span>
+      </button>
+      <button id="btnToggleSound" class="c-btn" title="Saniye Tik-Tak Sesi">
+        <span id="txtSound">🔇 Ses: Kapalı</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Ayarlar Modalı -->
+  <div id="settingsModalBackdrop" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>⚙️ Sınav ve Saat Ayarları</h2>
+        <button id="btnCloseSettingsX" class="btn-close-modal" title="Kapat">✕</button>
+      </div>
+
+      <!-- 1. Saat Ölçeği Ayarı -->
+      <div class="modal-section">
+        <div class="modal-section-title">🔍 Saat Boyutu (Ölçek)</div>
+        <div class="scale-control-box">
+          <div class="scale-header">
+            <span>Ekran Ölçeği:</span>
+            <span id="scaleValueBadge" class="scale-value-badge">%100</span>
+          </div>
+          <input type="range" id="scaleSlider" class="scale-slider" min="50" max="160" step="5" value="100">
+          <div class="scale-presets">
+            <button class="btn-preset" data-scale="75">Küçük (%75)</button>
+            <button class="btn-preset" data-scale="100">Standart (%100)</button>
+            <button class="btn-preset" data-scale="125">Büyük (%125)</button>
+            <button class="btn-preset" data-scale="150">Maksimum (%150)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Bölüm ve Branş Saatleri Ayarı -->
+      <div class="modal-section">
+        <div class="modal-section-title">🕒 Branş ve Sınav Saatleri</div>
+        <div class="settings-grid">
+          <div class="setting-item">
+            <label for="inpExamStart">Sınav Başlangıç:</label>
+            <input type="time" id="inpExamStart" value="10:15">
+          </div>
+
+          <div class="setting-item">
+            <label for="inpTurkceStart">📖 Türkçe Başlangıç:</label>
+            <input type="time" id="inpTurkceStart" value="10:15">
+          </div>
+
+          <div class="setting-item">
+            <label for="inpMatStart">📐 Matematik Başlangıç:</label>
+            <input type="time" id="inpMatStart" value="10:55">
+          </div>
+
+          <div class="setting-item">
+            <label for="inpGkStart">🏛️ Genel Kültür (Tarih):</label>
+            <input type="time" id="inpGkStart" value="11:55">
+          </div>
+
+          <div class="setting-item">
+            <label for="inpCografyaStart">🗺️ Coğrafya Başlangıç:</label>
+            <input type="time" id="inpCografyaStart" value="12:10">
+          </div>
+
+          <div class="setting-item">
+            <label for="inpVatandaslikStart">⚖️ Vatandaşlık & Güncel:</label>
+            <input type="time" id="inpVatandaslikStart" value="12:20">
+          </div>
+
+          <div class="setting-item" style="grid-column: 1 / -1;">
+            <label for="inpExamEnd">🏁 Sınav Bitiş Saati:</label>
+            <input type="time" id="inpExamEnd" value="12:25">
+          </div>
+        </div>
+      </div>
+
+      <!-- Butonlar -->
+      <div class="modal-actions">
+        <button id="btnSaveSettings" class="btn-save-settings">💾 Ayarları Kaydet</button>
+        <button id="btnResetSettingsDefault" class="btn-reset-settings">🔄 Varsayılana Dön</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen-hint">Tam ekranda fare hareketsiz kaldığında kontroller gizlenir. Çıkmak için ESC veya F tuşuna basabilirsiniz.</div>
+
+  <script>
+    // 1. Kadran Çizgileri ve Numaraları
+    const ticksGroup = document.getElementById('svgTicksGroup');
+    const numbersGroup = document.getElementById('svgNumbersGroup');
+
+    for (let i = 0; i < 60; i++) {
+      const angle = i * 6;
+      const isHour = i % 5 === 0;
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      const rOuter = 248;
+      const rInner = isHour ? 224 : 235;
+      const rad = (angle - 90) * (Math.PI / 180);
+
+      line.setAttribute('x1', Math.cos(rad) * rInner);
+      line.setAttribute('y1', Math.sin(rad) * rInner);
+      line.setAttribute('x2', Math.cos(rad) * rOuter);
+      line.setAttribute('y2', Math.sin(rad) * rOuter);
+      line.setAttribute('stroke', isHour ? '#111827' : '#374151');
+      line.setAttribute('stroke-width', isHour ? 4.5 : 1.8);
+      line.setAttribute('stroke-linecap', 'square');
+      ticksGroup.appendChild(line);
+    }
+
+    const numRadius = 192;
+    for (let num = 1; num <= 12; num++) {
+      const angle = num * 30;
+      const rad = (angle - 90) * (Math.PI / 180);
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', Math.cos(rad) * numRadius);
+      text.setAttribute('y', Math.sin(rad) * numRadius + 2);
+      text.textContent = num;
+      numbersGroup.appendChild(text);
+    }
+
+    // 2. Varsayılan Ayarlar & Konfigürasyon
+    const DEFAULT_CONFIG = {
+      scale: 100,
+      examStart: '10:15',
+      turkceStart: '10:15',
+      matStart: '10:55',
+      gkStart: '11:55',
+      cografyaStart: '12:10',
+      vatandaslikStart: '12:20',
+      examEnd: '12:25'
+    };
+
+    let config = { ...DEFAULT_CONFIG };
+
+    function loadSavedConfig() {
+      try {
+        const saved = localStorage.getItem('osym_clock_user_config');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          config = { ...DEFAULT_CONFIG, ...parsed };
+        }
+      } catch (e) {
+        config = { ...DEFAULT_CONFIG };
+      }
+      applyConfigToUI();
+    }
+
+    function saveConfig() {
+      try {
+        localStorage.setItem('osym_clock_user_config', JSON.stringify(config));
+      } catch (e) {}
+    }
+
+    function timeStringToSeconds(tStr) {
+      if (!tStr) return 0;
+      const parts = tStr.split(':');
+      const h = parseInt(parts[0], 10) || 0;
+      const m = parseInt(parts[1], 10) || 0;
+      const s = parseInt(parts[2], 10) || 0;
+      return h * 3600 + m * 60 + s;
+    }
+
+    function secondsToTimeString(sec) {
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+    }
+
+    // 3. Çalışma Durumu Değişkenleri
+    let currentMode = 'real'; // 'real' | 'exam'
+    let isExamRunning = true;
+    let isSoundOn = false;
+    let activeBranchKey = 'turkce';
+
+    let examSeconds = timeStringToSeconds(config.examStart);
+    let lastTimestamp = performance.now();
+    let lastSecondTick = -1;
+
+    // Elementler
+    const hourHand = document.getElementById('svgHourHand');
+    const minuteHand = document.getElementById('svgMinuteHand');
+    const secondHand = document.getElementById('svgSecondHand');
+
+    const topHud = document.getElementById('topHud');
+    const modeDisplayLabel = document.getElementById('modeDisplayLabel');
+    const examSectionWrapper = document.getElementById('examSectionWrapper');
+    const examSectionPill = document.getElementById('examSectionPill');
+    const kalanSureTimer = document.getElementById('kalanSureTimer');
+    const controlsContainer = document.getElementById('controlsContainer');
+    const examControlsRow = document.getElementById('examControlsRow');
+    const branchControlsRow = document.getElementById('branchControlsRow');
+
+    const btnModeReal = document.getElementById('btnModeReal');
+    const btnModeExam = document.getElementById('btnModeExam');
+    const btnFullscreenToggle = document.getElementById('btnFullscreenToggle');
+    const btnPlayPause = document.getElementById('btnPlayPause');
+    const txtPlayPause = document.getElementById('txtPlayPause');
+    const btnResetExam = document.getElementById('btnResetExam');
+    const btnToggleSound = document.getElementById('btnToggleSound');
+    const txtSound = document.getElementById('txtSound');
+
+    // Branş Düğmeleri
+    const btnBranchTurkce = document.getElementById('btnBranchTurkce');
+    const btnBranchMat = document.getElementById('btnBranchMat');
+    const btnBranchGk = document.getElementById('btnBranchGk');
+    const gkDropdownMenu = document.getElementById('gkDropdownMenu');
+    const btnSubTarih = document.getElementById('btnSubTarih');
+    const btnSubCografya = document.getElementById('btnSubCografya');
+    const btnSubVatandaslik = document.getElementById('btnSubVatandaslik');
+    const btnBranchCografyaDirect = document.getElementById('btnBranchCografyaDirect');
+    const btnBranchVatDirect = document.getElementById('btnBranchVatDirect');
+
+    // Ayarlar Modalı Elementleri
+    const btnOpenSettings = document.getElementById('btnOpenSettings');
+    const settingsModalBackdrop = document.getElementById('settingsModalBackdrop');
+    const btnCloseSettingsX = document.getElementById('btnCloseSettingsX');
+    const btnSaveSettings = document.getElementById('btnSaveSettings');
+    const btnResetSettingsDefault = document.getElementById('btnResetSettingsDefault');
+
+    const scaleSlider = document.getElementById('scaleSlider');
+    const scaleValueBadge = document.getElementById('scaleValueBadge');
+    const inpExamStart = document.getElementById('inpExamStart');
+    const inpTurkceStart = document.getElementById('inpTurkceStart');
+    const inpMatStart = document.getElementById('inpMatStart');
+    const inpGkStart = document.getElementById('inpGkStart');
+    const inpCografyaStart = document.getElementById('inpCografyaStart');
+    const inpVatandaslikStart = document.getElementById('inpVatandaslikStart');
+    const inpExamEnd = document.getElementById('inpExamEnd');
+
+    function applyScale(val) {
+      const scaleNum = Math.max(50, Math.min(160, parseInt(val, 10) || 100));
+      config.scale = scaleNum;
+      document.documentElement.style.setProperty('--clock-scale', (scaleNum / 100).toString());
+      if (scaleSlider) scaleSlider.value = scaleNum;
+      if (scaleValueBadge) scaleValueBadge.textContent = `%${scaleNum}`;
+    }
+
+    function applyConfigToUI() {
+      applyScale(config.scale);
+
+      // Butonlardaki saat etiketlerini güncelle
+      document.querySelectorAll('.lbl-time-turkce').forEach(el => el.textContent = config.turkceStart);
+      document.querySelectorAll('.lbl-time-mat').forEach(el => el.textContent = config.matStart);
+      document.querySelectorAll('.lbl-time-gk').forEach(el => el.textContent = config.gkStart);
+      document.querySelectorAll('.lbl-time-cografya').forEach(el => el.textContent = config.cografyaStart);
+      document.querySelectorAll('.lbl-time-vatandaslik').forEach(el => el.textContent = config.vatandaslikStart);
+
+      // Modal inputlarını doldur
+      if (inpExamStart) inpExamStart.value = config.examStart;
+      if (inpTurkceStart) inpTurkceStart.value = config.turkceStart;
+      if (inpMatStart) inpMatStart.value = config.matStart;
+      if (inpGkStart) inpGkStart.value = config.gkStart;
+      if (inpCografyaStart) inpCografyaStart.value = config.cografyaStart;
+      if (inpVatandaslikStart) inpVatandaslikStart.value = config.vatandaslikStart;
+      if (inpExamEnd) inpExamEnd.value = config.examEnd;
+
+      if (currentMode === 'exam') {
+        updateExamHUD();
+      }
+    }
+
+    // Ses Motoru
+    let audioContext = null;
+    function triggerTickAudio() {
+      if (!isSoundOn) return;
+      try {
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === 'suspended') audioContext.resume();
+
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1200, audioContext.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(60, audioContext.currentTime + 0.022);
+
+        gain.gain.setValueAtTime(0.25, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.022);
+
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.start();
+        osc.stop(audioContext.currentTime + 0.022);
+      } catch (err) {}
+    }
+
+    // Render Döngüsü
+    function render(now) {
+      const delta = (now - lastTimestamp) / 1000;
+      lastTimestamp = now;
+
+      let h, m, s;
+
+      if (currentMode === 'real') {
+        const d = new Date();
+        h = d.getHours();
+        m = d.getMinutes();
+        s = d.getSeconds() + d.getMilliseconds() / 1000;
+
+        const secInt = Math.floor(s);
+        if (secInt !== lastSecondTick) {
+          lastSecondTick = secInt;
+          triggerTickAudio();
+        }
+      } else {
+        const examEndSec = timeStringToSeconds(config.examEnd);
+
+        if (isExamRunning) {
+          examSeconds += delta;
+          if (examSeconds >= examEndSec) {
+            examSeconds = examEndSec;
+            isExamRunning = false;
+            updatePlayPauseButton();
+          }
+        }
+
+        const secInt = Math.floor(examSeconds);
+        if (secInt !== lastSecondTick && isExamRunning) {
+          lastSecondTick = secInt;
+          triggerTickAudio();
+        }
+
+        h = Math.floor(examSeconds / 3600);
+        m = Math.floor((examSeconds % 3600) / 60);
+        s = examSeconds % 60;
+
+        updateExamHUD();
+      }
+
+      const hourAngle = ((h % 12) + m / 60 + s / 3600) * 30;
+      const minuteAngle = (m + s / 60) * 6;
+      const secondAngle = Math.floor(s) * 6;
+
+      hourHand.setAttribute('transform', `rotate(${hourAngle})`);
+      minuteHand.setAttribute('transform', `rotate(${minuteAngle})`);
+      secondHand.setAttribute('transform', `rotate(${secondAngle})`);
+
+      requestAnimationFrame(render);
+    }
+
+    // HUD ve Kalan Süre Güncelleme
+    function updateExamHUD() {
+      const examEndSec = timeStringToSeconds(config.examEnd);
+      const remainingSec = Math.max(0, examEndSec - examSeconds);
+      const remMins = Math.floor(remainingSec / 60);
+      const remSecs = Math.floor(remainingSec % 60);
+      kalanSureTimer.textContent = `${remMins.toString().padStart(2, '0')}:${remSecs.toString().padStart(2, '0')}`;
+
+      const tSec = timeStringToSeconds(config.turkceStart);
+      const mSec = timeStringToSeconds(config.matStart);
+      const gSec = timeStringToSeconds(config.gkStart);
+      const cSec = timeStringToSeconds(config.cografyaStart);
+      const vSec = timeStringToSeconds(config.vatandaslikStart);
+
+      // Hangi bölümde olduğumuzu belirle
+      if (examSeconds >= examEndSec) {
+        examSectionPill.textContent = '🏁 Sınav Bitti';
+        examSectionPill.className = 'hud-pill bitti';
+        highlightBranchButton('');
+      } else if (examSeconds < mSec) {
+        examSectionPill.textContent = 'Türkçe Bölümü';
+        examSectionPill.className = 'hud-pill turkce';
+        highlightBranchButton('turkce');
+      } else if (examSeconds < gSec) {
+        examSectionPill.textContent = 'Matematik Bölümü';
+        examSectionPill.className = 'hud-pill matematik';
+        highlightBranchButton('matematik');
+      } else if (examSeconds < cSec) {
+        examSectionPill.textContent = 'Tarih (GK) Bölümü';
+        examSectionPill.className = 'hud-pill tarih';
+        highlightBranchButton('gk');
+      } else if (examSeconds < vSec) {
+        examSectionPill.textContent = 'Coğrafya (GK) Bölümü';
+        examSectionPill.className = 'hud-pill cografya';
+        highlightBranchButton('cografya');
+      } else {
+        examSectionPill.textContent = 'Vatandaşlık & Güncel';
+        examSectionPill.className = 'hud-pill vatandaslik';
+        highlightBranchButton('vatandaslik');
+      }
+    }
+
+    function highlightBranchButton(key) {
+      activeBranchKey = key;
+      btnBranchTurkce.classList.toggle('active-branch', key === 'turkce');
+      btnBranchMat.classList.toggle('active-branch', key === 'matematik');
+      btnBranchGk.classList.toggle('active-branch', key === 'gk');
+      btnBranchCografyaDirect.classList.toggle('active-branch', key === 'cografya');
+      btnBranchVatDirect.classList.toggle('active-branch', key === 'vatandaslik');
+    }
+
+    function updatePlayPauseButton() {
+      if (isExamRunning) {
+        txtPlayPause.textContent = '⏸️ Duraklat';
+        btnPlayPause.classList.add('active');
+      } else {
+        txtPlayPause.textContent = '▶️ Devam Et';
+        btnPlayPause.classList.remove('active');
+      }
+    }
+
+    // Branş Atlama ve Başlatma Fonksiyonu
+    function jumpToBranch(timeString, branchKey) {
+      if (currentMode !== 'exam') {
+        setExamMode();
+      }
+      examSeconds = timeStringToSeconds(timeString);
+      isExamRunning = true;
+      updatePlayPauseButton();
+      updateExamHUD();
+      highlightBranchButton(branchKey);
+      if (gkDropdownMenu) gkDropdownMenu.classList.remove('show');
+    }
+
+    function setRealMode() {
+      currentMode = 'real';
+      btnModeReal.classList.add('active');
+      btnModeExam.classList.remove('active');
+      examControlsRow.style.display = 'none';
+      branchControlsRow.style.display = 'none';
+      examSectionWrapper.style.display = 'none';
+      modeDisplayLabel.textContent = '🕒 Canlı Gerçek Saat';
+      if (gkDropdownMenu) gkDropdownMenu.classList.remove('show');
+    }
+
+    function setExamMode() {
+      currentMode = 'exam';
+      btnModeExam.classList.add('active');
+      btnModeReal.classList.remove('active');
+      examControlsRow.style.display = 'flex';
+      branchControlsRow.style.display = 'flex';
+      examSectionWrapper.style.display = 'inline-flex';
+      modeDisplayLabel.textContent = '📝 KPSS Prova Saati';
+      updateExamHUD();
+    }
+
+    btnModeReal.addEventListener('click', setRealMode);
+    btnModeExam.addEventListener('click', setExamMode);
+
+    btnPlayPause.addEventListener('click', () => {
+      isExamRunning = !isExamRunning;
+      updatePlayPauseButton();
+    });
+
+    btnResetExam.addEventListener('click', () => {
+      examSeconds = timeStringToSeconds(config.examStart);
+      isExamRunning = true;
+      updatePlayPauseButton();
+      updateExamHUD();
+    });
+
+    btnToggleSound.addEventListener('click', () => {
+      isSoundOn = !isSoundOn;
+      if (isSoundOn) {
+        txtSound.textContent = '🔊 Ses: Açık';
+        btnToggleSound.classList.add('active');
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === 'suspended') audioContext.resume();
+      } else {
+        txtSound.textContent = '🔇 Ses: Kapalı';
+        btnToggleSound.classList.remove('active');
+      }
+    });
+
+    // Branş Buton Olayları
+    btnBranchTurkce.addEventListener('click', () => {
+      jumpToBranch(config.turkceStart, 'turkce');
+    });
+
+    btnBranchMat.addEventListener('click', () => {
+      jumpToBranch(config.matStart, 'matematik');
+    });
+
+    btnBranchGk.addEventListener('click', (e) => {
+      // Tıklandığında hem doğrudan GK saatine atlasın hem de dropdown'u toggle etsin
+      if (e.target.closest('#btnBranchGk')) {
+        jumpToBranch(config.gkStart, 'gk');
+        gkDropdownMenu.classList.toggle('show');
+      }
+    });
+
+    btnSubTarih.addEventListener('click', () => {
+      jumpToBranch(config.gkStart, 'gk');
+    });
+
+    btnSubCografya.addEventListener('click', () => {
+      jumpToBranch(config.cografyaStart, 'cografya');
+    });
+
+    btnSubVatandaslik.addEventListener('click', () => {
+      jumpToBranch(config.vatandaslikStart, 'vatandaslik');
+    });
+
+    btnBranchCografyaDirect.addEventListener('click', () => {
+      jumpToBranch(config.cografyaStart, 'cografya');
+    });
+
+    btnBranchVatDirect.addEventListener('click', () => {
+      jumpToBranch(config.vatandaslikStart, 'vatandaslik');
+    });
+
+    // Sayfa dışı tıklamalarda dropdown kapat
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.dropdown-container')) {
+        if (gkDropdownMenu) gkDropdownMenu.classList.remove('show');
+      }
+    });
+
+    // Ayarlar Modalı İşlemleri
+    function openSettingsModal() {
+      settingsModalBackdrop.classList.add('open');
+      applyConfigToUI();
+    }
+
+    function closeSettingsModal() {
+      settingsModalBackdrop.classList.remove('open');
+    }
+
+    btnOpenSettings.addEventListener('click', openSettingsModal);
+    btnCloseSettingsX.addEventListener('click', closeSettingsModal);
+
+    settingsModalBackdrop.addEventListener('click', (e) => {
+      if (e.target === settingsModalBackdrop) {
+        closeSettingsModal();
+      }
+    });
+
+    // Canlı Ölçek Kaydırıcı
+    scaleSlider.addEventListener('input', (e) => {
+      applyScale(e.target.value);
+    });
+
+    document.querySelectorAll('.btn-preset').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = btn.getAttribute('data-scale');
+        applyScale(val);
+      });
+    });
+
+    // Ayarları Kaydet
+    btnSaveSettings.addEventListener('click', () => {
+      config.examStart = inpExamStart.value || DEFAULT_CONFIG.examStart;
+      config.turkceStart = inpTurkceStart.value || DEFAULT_CONFIG.turkceStart;
+      config.matStart = inpMatStart.value || DEFAULT_CONFIG.matStart;
+      config.gkStart = inpGkStart.value || DEFAULT_CONFIG.gkStart;
+      config.cografyaStart = inpCografyaStart.value || DEFAULT_CONFIG.cografyaStart;
+      config.vatandaslikStart = inpVatandaslikStart.value || DEFAULT_CONFIG.vatandaslikStart;
+      config.examEnd = inpExamEnd.value || DEFAULT_CONFIG.examEnd;
+      config.scale = parseInt(scaleSlider.value, 10) || 100;
+
+      saveConfig();
+      applyConfigToUI();
+      closeSettingsModal();
+    });
+
+    // Ayarları Varsayılana Sıfırla
+    btnResetSettingsDefault.addEventListener('click', () => {
+      if (confirm('Bütün saatleri ve ölçeği varsayılan KPSS ayarlarına döndürmek istiyor musunuz?')) {
+        config = { ...DEFAULT_CONFIG };
+        saveConfig();
+        applyConfigToUI();
+      }
+    });
+
+    // Tam Ekran İşlemleri
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+          document.body.classList.add('is-fullscreen');
+        }).catch(() => {});
+      } else {
+        document.exitFullscreen().then(() => {
+          document.body.classList.remove('is-fullscreen');
+        }).catch(() => {});
+      }
+    }
+
+    btnFullscreenToggle.addEventListener('click', toggleFullscreen);
+
+    document.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement) {
+        document.body.classList.add('is-fullscreen');
+      } else {
+        document.body.classList.remove('is-fullscreen');
+      }
+    });
+
+    // Otomatik Kontrol Gizleme (Idle)
+    let idleTimeout = null;
+    function handleUserActivity() {
+      controlsContainer.classList.remove('hidden');
+      topHud.classList.remove('hidden');
+      clearTimeout(idleTimeout);
+
+      // Modal veya dropdown açıkken kontrolleri gizleme
+      if (settingsModalBackdrop.classList.contains('open') || (gkDropdownMenu && gkDropdownMenu.classList.contains('show'))) {
+        return;
+      }
+
+      idleTimeout = setTimeout(() => {
+        if (!settingsModalBackdrop.classList.contains('open') && (!gkDropdownMenu || !gkDropdownMenu.classList.contains('show'))) {
+          controlsContainer.classList.add('hidden');
+          topHud.classList.add('hidden');
+        }
+      }, 3500);
+    }
+
+    window.addEventListener('mousemove', handleUserActivity);
+    window.addEventListener('touchstart', handleUserActivity);
+    window.addEventListener('keydown', (e) => {
+      handleUserActivity();
+      if (e.key === 'Escape') {
+        if (settingsModalBackdrop.classList.contains('open')) {
+          closeSettingsModal();
+        } else if (gkDropdownMenu && gkDropdownMenu.classList.contains('show')) {
+          gkDropdownMenu.classList.remove('show');
+        }
+      }
+      if (e.key === 'f' || e.key === 'F') {
+        if (!settingsModalBackdrop.classList.contains('open')) {
+          toggleFullscreen();
+        }
+      }
+      if (e.key === ' ') {
+        if (currentMode === 'exam' && !settingsModalBackdrop.classList.contains('open')) {
+          e.preventDefault();
+          isExamRunning = !isExamRunning;
+          updatePlayPauseButton();
+        }
+      }
+    });
+
+    // Başlangıç
+    loadSavedConfig();
+    handleUserActivity();
+    requestAnimationFrame(render);
+  </script>
+</body>
+</html>
