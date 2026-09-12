@@ -2,13 +2,21 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="theme-color" content="#141c26">
   <title>ÖSYM KPSS Önlisans Duvar Saati & Prova Saati</title>
   <style>
     :root {
       --wall-tone-1: #253342;
       --wall-tone-2: #141c26;
       --clock-scale: 1.0;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
     }
 
     * {
@@ -17,12 +25,19 @@
       padding: 0;
       user-select: none;
       -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
 
     html, body {
       width: 100vw;
       height: 100vh;
+      height: 100dvh;
+      min-height: -webkit-fill-available;
       overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-text-size-adjust: 100%;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: radial-gradient(circle at 50% 45%, var(--wall-tone-1) 0%, var(--wall-tone-2) 100%);
       display: flex;
@@ -54,16 +69,43 @@
       transform: scale(var(--clock-scale));
       transform-origin: center center;
       transition: width 0.35s ease, height 0.35s ease, max-width 0.35s ease, max-height 0.35s ease, transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-      filter: drop-shadow(0 25px 45px rgba(0, 0, 0, 0.65)) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+      filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.65)) drop-shadow(0 6px 14px rgba(0, 0, 0, 0.4));
     }
 
+    /* Tam Ekran / Mobil Tam Ekran Modu */
     :fullscreen #clock-wrapper,
     :-webkit-full-screen #clock-wrapper,
     .is-fullscreen #clock-wrapper {
-      width: min(94vw, 94vh);
-      height: min(94vw, 94vh);
+      width: min(92vw, 92dvh);
+      height: min(92vw, 92dvh);
       max-width: 950px;
       max-height: 950px;
+    }
+
+    /* iPhone SE ve Küçük Ekran Uyarlaması (Portrait) */
+    @media (max-width: 480px) {
+      #clock-wrapper {
+        width: min(72vw, 38dvh);
+        height: min(72vw, 38dvh);
+        filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.65)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+      }
+
+      .is-fullscreen #clock-wrapper {
+        width: min(88vw, 68dvh);
+        height: min(88vw, 68dvh);
+      }
+    }
+
+    /* Yatay Mobil (Landscape: 667x375) */
+    @media (max-height: 500px) and (orientation: landscape) {
+      #clock-wrapper {
+        width: min(58dvh, 58vw);
+        height: min(58dvh, 58vw);
+      }
+      .is-fullscreen #clock-wrapper {
+        width: min(88dvh, 88vw);
+        height: min(88dvh, 88vw);
+      }
     }
 
     svg#clock-svg {
@@ -76,25 +118,26 @@
     /* Üst Durum Göstergesi (HUD) */
     .top-hud {
       position: fixed;
-      top: 18px;
+      top: max(14px, calc(var(--safe-top) + 6px));
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(15, 23, 42, 0.88);
+      background: rgba(15, 23, 42, 0.90);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.14);
       border-radius: 40px;
-      padding: 8px 22px;
+      padding: 7px 18px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       color: #f1f5f9;
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 500;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
       z-index: 20;
-      transition: opacity 0.4s ease, transform 0.4s ease;
+      transition: opacity 0.35s ease, transform 0.35s ease;
       white-space: nowrap;
+      max-width: calc(100vw - 20px);
     }
 
     .top-hud.hidden {
@@ -106,12 +149,12 @@
     .hud-pill {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 3px 12px;
-      border-radius: 20px;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 16px;
       font-weight: 700;
-      font-size: 12.5px;
-      letter-spacing: 0.3px;
+      font-size: 12px;
+      letter-spacing: 0.2px;
       transition: all 0.25s ease;
     }
 
@@ -127,22 +170,55 @@
       font-variant-numeric: tabular-nums;
       font-weight: 700;
       color: #f59e0b;
-      font-size: 15px;
+      font-size: 14.5px;
+    }
+
+    @media (max-width: 480px) {
+      .top-hud {
+        top: max(8px, calc(var(--safe-top) + 4px));
+        padding: 5px 12px;
+        gap: 6px;
+        font-size: 11.5px;
+        border-radius: 20px;
+      }
+
+      .hud-pill {
+        padding: 2px 7px;
+        font-size: 11px;
+      }
+
+      .hud-time {
+        font-size: 13.5px;
+      }
+    }
+
+    @media (max-height: 500px) and (orientation: landscape) {
+      .top-hud {
+        top: max(5px, var(--safe-top));
+        padding: 3px 10px;
+        font-size: 11px;
+        gap: 5px;
+      }
+      .hud-pill { padding: 1.5px 6px; font-size: 10.5px; }
+      .hud-time { font-size: 12.5px; }
     }
 
     /* Alt Kontrol Paneli */
     .controls-container {
       position: fixed;
-      bottom: 20px;
+      bottom: max(14px, calc(var(--safe-bottom) + 8px));
       left: 50%;
       transform: translateX(-50%);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       z-index: 20;
-      transition: opacity 0.4s ease, transform 0.4s ease;
-      max-width: 98vw;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      width: 100%;
+      max-width: 100vw;
+      padding: 0 10px;
+      pointer-events: none;
     }
 
     .controls-container.hidden {
@@ -152,18 +228,20 @@
     }
 
     .control-row {
-      background: rgba(15, 23, 42, 0.88);
+      pointer-events: auto;
+      background: rgba(15, 23, 42, 0.92);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 18px;
-      padding: 8px 14px;
+      padding: 7px 12px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+      gap: 6px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
       flex-wrap: wrap;
       justify-content: center;
+      max-width: 100%;
     }
 
     .c-btn {
@@ -172,43 +250,48 @@
       color: #f8fafc;
       font-size: 12.5px;
       font-weight: 600;
-      padding: 6.5px 13px;
+      padding: 6.5px 12px;
       border-radius: 10px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
       white-space: nowrap;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      min-height: 36px;
     }
 
     .c-btn:hover {
       background: rgba(255, 255, 255, 0.18);
       border-color: rgba(255, 255, 255, 0.3);
-      transform: translateY(-1px);
     }
 
-    .c-btn:active { transform: translateY(1px); }
+    .c-btn:active {
+      transform: scale(0.96);
+    }
 
     .c-btn.active {
       background: #2563eb;
       border-color: #60a5fa;
       color: #ffffff;
-      box-shadow: 0 0 14px rgba(37, 99, 235, 0.45);
+      box-shadow: 0 0 12px rgba(37, 99, 235, 0.45);
     }
 
     .c-btn.btn-play.active {
       background: #16a34a;
       border-color: #4ade80;
-      box-shadow: 0 0 14px rgba(22, 163, 74, 0.45);
+      box-shadow: 0 0 12px rgba(22, 163, 74, 0.45);
     }
 
     .c-btn.btn-branch {
       background: rgba(30, 41, 59, 0.85);
       border: 1px solid rgba(148, 163, 184, 0.25);
       color: #e2e8f0;
-      font-size: 12px;
-      padding: 6px 11px;
+      font-size: 11.5px;
+      padding: 6px 10px;
     }
 
     .c-btn.btn-branch:hover {
@@ -247,6 +330,107 @@
       box-shadow: 0 0 12px rgba(219, 39, 119, 0.5);
     }
 
+    /* iPhone SE 3 & Mobil Kontrol Uyarlamaları */
+    @media (max-width: 480px) {
+      .controls-container {
+        bottom: max(8px, calc(var(--safe-bottom) + 4px));
+        gap: 5px;
+        padding: 0 6px;
+      }
+
+      .control-row {
+        padding: 5px 8px;
+        gap: 4px;
+        border-radius: 14px;
+      }
+
+      .c-btn {
+        font-size: 11.5px;
+        padding: 5.5px 8.5px;
+        border-radius: 8px;
+        min-height: 34px;
+        gap: 4px;
+      }
+
+      /* Ana Buton Çubuğu: 4 butonu 375px genişliğe tam sığdırır */
+      #mainControlsRow {
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 365px;
+      }
+
+      #mainControlsRow .c-btn {
+        flex: 1;
+        padding: 5.5px 4px;
+        font-size: 11px;
+      }
+
+      /* Branş Butonları Çubuğu: Yatay Kaydırılabilir Çipler */
+      #branchControlsRow {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-start;
+        max-width: calc(100vw - 12px);
+        padding: 5px 8px;
+        scrollbar-width: none;
+      }
+
+      #branchControlsRow::-webkit-scrollbar {
+        display: none;
+      }
+
+      #branchControlsRow .c-btn {
+        flex-shrink: 0;
+        font-size: 11px;
+        padding: 5px 9px;
+        border-radius: 20px;
+      }
+
+      /* Prova Saati İşlem Kontrolleri */
+      #examControlsRow {
+        flex-wrap: nowrap;
+        justify-content: center;
+        gap: 5px;
+        max-width: 365px;
+        width: 100%;
+      }
+
+      #examControlsRow .c-btn {
+        flex: 1;
+        font-size: 11px;
+        padding: 5.5px 6px;
+      }
+    }
+
+    /* Yatay Mod (Landscape) Kontroller */
+    @media (max-height: 500px) and (orientation: landscape) {
+      .controls-container {
+        bottom: max(4px, var(--safe-bottom));
+        gap: 3px;
+        padding: 0 4px;
+      }
+      .control-row {
+        padding: 4px 8px;
+        gap: 4px;
+        border-radius: 12px;
+      }
+      .c-btn {
+        font-size: 10.5px;
+        padding: 3.5px 7px;
+        min-height: 28px;
+      }
+      #branchControlsRow {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        max-width: calc(100vw - 16px);
+      }
+      #branchControlsRow .c-btn {
+        flex-shrink: 0;
+      }
+    }
+
     /* Dropdown Menü (Genel Kültür Alt Dalları) */
     .dropdown-container {
       position: relative;
@@ -258,7 +442,7 @@
       bottom: calc(100% + 8px);
       left: 50%;
       transform: translateX(-50%) translateY(8px);
-      background: rgba(15, 23, 42, 0.96);
+      background: rgba(15, 23, 42, 0.98);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.16);
@@ -268,7 +452,7 @@
       flex-direction: column;
       gap: 4px;
       min-width: 210px;
-      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.65);
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.7);
       opacity: 0;
       pointer-events: none;
       transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
@@ -291,16 +475,17 @@
       border: none;
       border-radius: 8px;
       color: #f1f5f9;
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 500;
       cursor: pointer;
       text-align: left;
       transition: background 0.15s ease;
       white-space: nowrap;
+      min-height: 34px;
     }
 
-    .dropdown-item:hover {
-      background: rgba(255, 255, 255, 0.1);
+    .dropdown-item:hover, .dropdown-item:active {
+      background: rgba(255, 255, 255, 0.12);
     }
 
     .dropdown-item .badge {
@@ -316,7 +501,7 @@
     .modal-backdrop {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.72);
+      background: rgba(0, 0, 0, 0.75);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       display: flex;
@@ -326,6 +511,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.25s ease;
+      padding: 12px;
     }
 
     .modal-backdrop.open {
@@ -337,13 +523,15 @@
       background: #0f172a;
       border: 1px solid rgba(255, 255, 255, 0.16);
       border-radius: 20px;
-      width: 92vw;
-      max-width: 520px;
-      max-height: 90vh;
+      width: 94vw;
+      max-width: 480px;
+      max-height: 88vh;
+      max-height: 88dvh;
       overflow-y: auto;
-      padding: 24px;
+      -webkit-overflow-scrolling: touch;
+      padding: 20px 18px;
       color: #f8fafc;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
       transform: scale(0.95);
       transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -357,44 +545,50 @@
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding-bottom: 14px;
-      margin-bottom: 18px;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
     }
 
     .modal-header h2 {
-      font-size: 18px;
+      font-size: 16.5px;
       font-weight: 700;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       color: #f1f5f9;
     }
 
     .btn-close-modal {
-      background: transparent;
-      border: none;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       color: #94a3b8;
-      font-size: 22px;
+      font-size: 16px;
       cursor: pointer;
-      line-height: 1;
-      padding: 4px;
-      border-radius: 6px;
-      transition: color 0.15s;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.15s;
     }
 
-    .btn-close-modal:hover { color: #f8fafc; }
+    .btn-close-modal:hover, .btn-close-modal:active {
+      background: rgba(255, 255, 255, 0.2);
+      color: #f8fafc;
+    }
 
     .modal-section {
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .modal-section-title {
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: #60a5fa;
-      margin-bottom: 10px;
+      margin-bottom: 9px;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -403,21 +597,17 @@
     .settings-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    @media (max-width: 480px) {
-      .settings-grid { grid-template-columns: 1fr; }
+      gap: 8px;
     }
 
     .setting-item {
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 12px;
-      padding: 10px 12px;
+      padding: 8px 10px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
     }
 
     .setting-item label {
@@ -429,17 +619,22 @@
       justify-content: space-between;
     }
 
+    /* iOS Safari 16px font-size: Otomatik zoomu engeller */
     .setting-item input[type="time"] {
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       color: #f8fafc;
-      padding: 6px 10px;
+      padding: 6px 8px;
       border-radius: 8px;
-      font-size: 14px;
+      font-size: 16px !important;
       font-weight: 600;
       font-family: inherit;
       outline: none;
       transition: border-color 0.2s;
+      width: 100%;
+      text-align: center;
+      -webkit-appearance: none;
+      min-height: 38px;
     }
 
     .setting-item input[type="time"]:focus {
@@ -447,22 +642,53 @@
       box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
     }
 
+    /* Mobil Ayarlar Düzeni (iPhone SE) */
+    @media (max-width: 480px) {
+      .modal-card {
+        padding: 16px 14px;
+        border-radius: 16px;
+      }
+
+      .settings-grid {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .setting-item {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 7px 10px;
+      }
+
+      .setting-item label {
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      .setting-item input[type="time"] {
+        width: 108px;
+        padding: 4px 6px;
+        min-height: 34px;
+      }
+    }
+
     /* Ölçek Kaydırıcı */
     .scale-control-box {
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 12px;
-      padding: 14px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
     .scale-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 600;
       color: #cbd5e1;
     }
@@ -478,7 +704,7 @@
 
     .scale-slider {
       width: 100%;
-      height: 6px;
+      height: 8px;
       background: #334155;
       border-radius: 4px;
       outline: none;
@@ -490,8 +716,8 @@
     .scale-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 18px;
-      height: 18px;
+      width: 22px;
+      height: 22px;
       background: #60a5fa;
       border: 2px solid #ffffff;
       border-radius: 50%;
@@ -500,14 +726,13 @@
     }
 
     .scale-presets {
-      display: flex;
-      gap: 6px;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
     }
 
     .btn-preset {
-      flex: 1;
-      padding: 5px 8px;
+      padding: 6px 4px;
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 6px;
@@ -517,19 +742,20 @@
       cursor: pointer;
       text-align: center;
       transition: all 0.15s;
+      white-space: nowrap;
     }
 
-    .btn-preset:hover {
-      background: rgba(255, 255, 255, 0.14);
+    .btn-preset:hover, .btn-preset:active {
+      background: rgba(255, 255, 255, 0.16);
       color: #ffffff;
     }
 
     .modal-actions {
       display: flex;
-      gap: 10px;
-      margin-top: 24px;
+      gap: 8px;
+      margin-top: 18px;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding-top: 16px;
+      padding-top: 14px;
     }
 
     .btn-save-settings {
@@ -537,9 +763,9 @@
       background: #2563eb;
       border: 1px solid #60a5fa;
       color: #ffffff;
-      padding: 10px 16px;
+      padding: 9px 14px;
       border-radius: 10px;
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       display: flex;
@@ -548,9 +774,10 @@
       gap: 6px;
       box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
       transition: all 0.2s;
+      min-height: 42px;
     }
 
-    .btn-save-settings:hover {
+    .btn-save-settings:hover, .btn-save-settings:active {
       background: #1d4ed8;
       transform: translateY(-1px);
     }
@@ -560,9 +787,9 @@
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.18);
       color: #cbd5e1;
-      padding: 10px 14px;
+      padding: 9px 10px;
       border-radius: 10px;
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       display: flex;
@@ -570,9 +797,11 @@
       align-items: center;
       gap: 4px;
       transition: all 0.2s;
+      min-height: 42px;
+      white-space: nowrap;
     }
 
-    .btn-reset-settings:hover {
+    .btn-reset-settings:hover, .btn-reset-settings:active {
       background: rgba(255, 255, 255, 0.16);
       color: #ffffff;
     }
@@ -584,6 +813,14 @@
       color: rgba(255, 255, 255, 0.3);
       pointer-events: none;
       z-index: 10;
+      text-align: center;
+      padding: 0 10px;
+    }
+
+    @media (max-width: 480px) {
+      .screen-hint {
+        display: none;
+      }
     }
   </style>
 </head>
@@ -716,22 +953,22 @@
   <!-- Alt Kontrol Paneli -->
   <div id="controlsContainer" class="controls-container">
     <!-- Ana Mod ve Araç Çubuğu -->
-    <div class="control-row">
+    <div id="mainControlsRow" class="control-row">
       <button id="btnModeReal" class="c-btn active" title="Gerçek Saat">
-        <span>🕒 Gerçek Saat</span>
+        <span>🕒 Canlı</span>
       </button>
       <button id="btnModeExam" class="c-btn" title="KPSS Prova Saati Modu">
-        <span>📝 Prova Saati</span>
+        <span>📝 Prova</span>
       </button>
       <button id="btnOpenSettings" class="c-btn" title="Saatleri ve Boyutu Ayarla">
-        <span>⚙️ Ayarlar</span>
+        <span>⚙️ Ayar</span>
       </button>
       <button id="btnFullscreenToggle" class="c-btn" title="Tam Ekran (F)">
-        <span>⛶ Tam Ekran</span>
+        <span>⛶ Ekran</span>
       </button>
     </div>
 
-    <!-- Hızlı Branş / Bölüm Seçici Çubuğu (Prova Modu Açıkken Aktif) -->
+    <!-- Hızlı Branş / Bölüm Seçici Çubuğu (Prova Modu Açıkken Aktif - Mobilde Yatay Kaydırılabilir) -->
     <div id="branchControlsRow" class="control-row" style="display: none;">
       <button id="btnBranchTurkce" class="c-btn btn-branch" title="Türkçe Branşına Başla">
         <span>📖 Türkçe (<span class="lbl-time-turkce">10:15</span>)</span>
@@ -743,7 +980,7 @@
       <!-- Genel Kültür Açılır Menü Butonu -->
       <div class="dropdown-container">
         <button id="btnBranchGk" class="c-btn btn-branch gk" title="Genel Kültür Bölümünü Başlat">
-          <span>🏛️ Genel Kültür (<span class="lbl-time-gk">11:55</span>) ▾</span>
+          <span>🏛️ GK (<span class="lbl-time-gk">11:55</span>) ▾</span>
         </button>
         <div id="gkDropdownMenu" class="dropdown-menu">
           <button class="dropdown-item" id="btnSubTarih">
@@ -776,7 +1013,7 @@
         <span id="txtPlayPause">⏸️ Duraklat</span>
       </button>
       <button id="btnResetExam" class="c-btn" title="Sınav Başlangıcına Sıfırla">
-        <span>🔄 Başa Sıfırla</span>
+        <span>🔄 Başa Al</span>
       </button>
       <button id="btnToggleSound" class="c-btn" title="Saniye Tik-Tak Sesi">
         <span id="txtSound">🔇 Ses: Kapalı</span>
@@ -802,10 +1039,10 @@
           </div>
           <input type="range" id="scaleSlider" class="scale-slider" min="50" max="160" step="5" value="100">
           <div class="scale-presets">
-            <button class="btn-preset" data-scale="75">Küçük (%75)</button>
-            <button class="btn-preset" data-scale="100">Standart (%100)</button>
-            <button class="btn-preset" data-scale="125">Büyük (%125)</button>
-            <button class="btn-preset" data-scale="150">Maksimum (%150)</button>
+            <button class="btn-preset" data-scale="75">%75</button>
+            <button class="btn-preset" data-scale="100">%100</button>
+            <button class="btn-preset" data-scale="125">%125</button>
+            <button class="btn-preset" data-scale="150">%150</button>
           </div>
         </div>
       </div>
@@ -844,7 +1081,7 @@
             <input type="time" id="inpVatandaslikStart" value="12:20">
           </div>
 
-          <div class="setting-item" style="grid-column: 1 / -1;">
+          <div class="setting-item">
             <label for="inpExamEnd">🏁 Sınav Bitiş Saati:</label>
             <input type="time" id="inpExamEnd" value="12:25">
           </div>
@@ -853,8 +1090,8 @@
 
       <!-- Butonlar -->
       <div class="modal-actions">
-        <button id="btnSaveSettings" class="btn-save-settings">💾 Ayarları Kaydet</button>
-        <button id="btnResetSettingsDefault" class="btn-reset-settings">🔄 Varsayılana Dön</button>
+        <button id="btnSaveSettings" class="btn-save-settings">💾 Kaydet</button>
+        <button id="btnResetSettingsDefault" class="btn-reset-settings">🔄 Sıfırla</button>
       </div>
     </div>
   </div>
@@ -932,7 +1169,7 @@
       if (!tStr) return 0;
       const parts = tStr.split(':');
       const h = parseInt(parts[0], 10) || 0;
-      const m = parseInt(parts[1], 10) || 0;
+      const m = parseInt(parts, 10) || 0;
       const s = parseInt(parts[2], 10) || 0;
       return h * 3600 + m * 60 + s;
     }
@@ -1036,13 +1273,22 @@
       }
     }
 
-    // Ses Motoru
+    // Ses Motoru (iOS Safari Uyumlu)
     let audioContext = null;
+    function initAudio() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioContext && audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+    }
+
     function triggerTickAudio() {
       if (!isSoundOn) return;
       try {
-        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioContext.state === 'suspended') audioContext.resume();
+        initAudio();
+        if (!audioContext) return;
 
         const osc = audioContext.createOscillator();
         const gain = audioContext.createGain();
@@ -1128,29 +1374,31 @@
       const cSec = timeStringToSeconds(config.cografyaStart);
       const vSec = timeStringToSeconds(config.vatandaslikStart);
 
-      // Hangi bölümde olduğumuzu belirle
+      // Hangi bölümde olduğumuzu belirle (Mobilde kısa metinler)
+      const isMobile = window.innerWidth <= 480;
+
       if (examSeconds >= examEndSec) {
-        examSectionPill.textContent = '🏁 Sınav Bitti';
+        examSectionPill.textContent = '🏁 Bitti';
         examSectionPill.className = 'hud-pill bitti';
         highlightBranchButton('');
       } else if (examSeconds < mSec) {
-        examSectionPill.textContent = 'Türkçe Bölümü';
+        examSectionPill.textContent = isMobile ? 'Türkçe' : 'Türkçe Bölümü';
         examSectionPill.className = 'hud-pill turkce';
         highlightBranchButton('turkce');
       } else if (examSeconds < gSec) {
-        examSectionPill.textContent = 'Matematik Bölümü';
+        examSectionPill.textContent = isMobile ? 'Matematik' : 'Matematik Bölümü';
         examSectionPill.className = 'hud-pill matematik';
         highlightBranchButton('matematik');
       } else if (examSeconds < cSec) {
-        examSectionPill.textContent = 'Tarih (GK) Bölümü';
+        examSectionPill.textContent = isMobile ? 'Tarih' : 'Tarih (GK) Bölümü';
         examSectionPill.className = 'hud-pill tarih';
         highlightBranchButton('gk');
       } else if (examSeconds < vSec) {
-        examSectionPill.textContent = 'Coğrafya (GK) Bölümü';
+        examSectionPill.textContent = isMobile ? 'Coğrafya' : 'Coğrafya (GK)';
         examSectionPill.className = 'hud-pill cografya';
         highlightBranchButton('cografya');
       } else {
-        examSectionPill.textContent = 'Vatandaşlık & Güncel';
+        examSectionPill.textContent = isMobile ? 'Vatandaşlık' : 'Vatandaşlık & Güncel';
         examSectionPill.className = 'hud-pill vatandaslik';
         highlightBranchButton('vatandaslik');
       }
@@ -1170,7 +1418,7 @@
         txtPlayPause.textContent = '⏸️ Duraklat';
         btnPlayPause.classList.add('active');
       } else {
-        txtPlayPause.textContent = '▶️ Devam Et';
+        txtPlayPause.textContent = '▶️ Başlat';
         btnPlayPause.classList.remove('active');
       }
     }
@@ -1195,7 +1443,7 @@
       examControlsRow.style.display = 'none';
       branchControlsRow.style.display = 'none';
       examSectionWrapper.style.display = 'none';
-      modeDisplayLabel.textContent = '🕒 Canlı Gerçek Saat';
+      modeDisplayLabel.textContent = window.innerWidth <= 480 ? '🕒 Canlı' : '🕒 Canlı Gerçek Saat';
       if (gkDropdownMenu) gkDropdownMenu.classList.remove('show');
     }
 
@@ -1206,7 +1454,7 @@
       examControlsRow.style.display = 'flex';
       branchControlsRow.style.display = 'flex';
       examSectionWrapper.style.display = 'inline-flex';
-      modeDisplayLabel.textContent = '📝 KPSS Prova Saati';
+      modeDisplayLabel.textContent = window.innerWidth <= 480 ? '📝 Prova' : '📝 KPSS Prova';
       updateExamHUD();
     }
 
@@ -1214,6 +1462,7 @@
     btnModeExam.addEventListener('click', setExamMode);
 
     btnPlayPause.addEventListener('click', () => {
+      initAudio();
       isExamRunning = !isExamRunning;
       updatePlayPauseButton();
     });
@@ -1226,12 +1475,11 @@
     });
 
     btnToggleSound.addEventListener('click', () => {
+      initAudio();
       isSoundOn = !isSoundOn;
       if (isSoundOn) {
         txtSound.textContent = '🔊 Ses: Açık';
         btnToggleSound.classList.add('active');
-        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioContext.state === 'suspended') audioContext.resume();
       } else {
         txtSound.textContent = '🔇 Ses: Kapalı';
         btnToggleSound.classList.remove('active');
@@ -1239,41 +1487,20 @@
     });
 
     // Branş Buton Olayları
-    btnBranchTurkce.addEventListener('click', () => {
-      jumpToBranch(config.turkceStart, 'turkce');
-    });
-
-    btnBranchMat.addEventListener('click', () => {
-      jumpToBranch(config.matStart, 'matematik');
-    });
-
+    btnBranchTurkce.addEventListener('click', () => jumpToBranch(config.turkceStart, 'turkce'));
+    btnBranchMat.addEventListener('click', () => jumpToBranch(config.matStart, 'matematik'));
     btnBranchGk.addEventListener('click', (e) => {
-      // Tıklandığında hem doğrudan GK saatine atlasın hem de dropdown'u toggle etsin
       if (e.target.closest('#btnBranchGk')) {
         jumpToBranch(config.gkStart, 'gk');
         gkDropdownMenu.classList.toggle('show');
       }
     });
 
-    btnSubTarih.addEventListener('click', () => {
-      jumpToBranch(config.gkStart, 'gk');
-    });
-
-    btnSubCografya.addEventListener('click', () => {
-      jumpToBranch(config.cografyaStart, 'cografya');
-    });
-
-    btnSubVatandaslik.addEventListener('click', () => {
-      jumpToBranch(config.vatandaslikStart, 'vatandaslik');
-    });
-
-    btnBranchCografyaDirect.addEventListener('click', () => {
-      jumpToBranch(config.cografyaStart, 'cografya');
-    });
-
-    btnBranchVatDirect.addEventListener('click', () => {
-      jumpToBranch(config.vatandaslikStart, 'vatandaslik');
-    });
+    btnSubTarih.addEventListener('click', () => jumpToBranch(config.gkStart, 'gk'));
+    btnSubCografya.addEventListener('click', () => jumpToBranch(config.cografyaStart, 'cografya'));
+    btnSubVatandaslik.addEventListener('click', () => jumpToBranch(config.vatandaslikStart, 'vatandaslik'));
+    btnBranchCografyaDirect.addEventListener('click', () => jumpToBranch(config.cografyaStart, 'cografya'));
+    btnBranchVatDirect.addEventListener('click', () => jumpToBranch(config.vatandaslikStart, 'vatandaslik'));
 
     // Sayfa dışı tıklamalarda dropdown kapat
     document.addEventListener('click', (e) => {
@@ -1338,16 +1565,68 @@
       }
     });
 
-    // Tam Ekran İşlemleri
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().then(() => {
-          document.body.classList.add('is-fullscreen');
-        }).catch(() => {});
+    // iOS ve Modern Tarayıcı Uyumlu Tam Ekran Motoru
+    function isFullscreenActive() {
+      return !!(
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.body.classList.contains('is-fullscreen')
+      );
+    }
+
+    function updateFullscreenButton() {
+      const isFull = isFullscreenActive();
+      if (isFull) {
+        btnFullscreenToggle.classList.add('active');
+        btnFullscreenToggle.innerHTML = '<span>✕ Küçült</span>';
       } else {
-        document.exitFullscreen().then(() => {
+        btnFullscreenToggle.classList.remove('active');
+        btnFullscreenToggle.innerHTML = '<span>⛶ Ekran</span>';
+      }
+    }
+
+    function toggleFullscreen() {
+      const isFull = isFullscreenActive();
+      if (!isFull) {
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen().then(() => {
+            document.body.classList.add('is-fullscreen');
+            updateFullscreenButton();
+          }).catch(() => {
+            // iOS Safari fallback
+            document.body.classList.add('is-fullscreen');
+            updateFullscreenButton();
+          });
+        } else if (document.documentElement.webkitRequestFullscreen) {
+          try {
+            document.documentElement.webkitRequestFullscreen();
+          } catch (e) {}
+          document.body.classList.add('is-fullscreen');
+          updateFullscreenButton();
+        } else {
+          // iPhone Safari: Görsel tam ekran
+          document.body.classList.add('is-fullscreen');
+          updateFullscreenButton();
+        }
+      } else {
+        if (document.exitFullscreen && document.fullscreenElement) {
+          document.exitFullscreen().then(() => {
+            document.body.classList.remove('is-fullscreen');
+            updateFullscreenButton();
+          }).catch(() => {
+            document.body.classList.remove('is-fullscreen');
+            updateFullscreenButton();
+          });
+        } else if (document.webkitExitFullscreen && document.webkitFullscreenElement) {
+          try {
+            document.webkitExitFullscreen();
+          } catch (e) {}
           document.body.classList.remove('is-fullscreen');
-        }).catch(() => {});
+          updateFullscreenButton();
+        } else {
+          document.body.classList.remove('is-fullscreen');
+          updateFullscreenButton();
+        }
       }
     }
 
@@ -1359,20 +1638,25 @@
       } else {
         document.body.classList.remove('is-fullscreen');
       }
+      updateFullscreenButton();
     });
 
-    // Otomatik Kontrol Gizleme (Idle)
-    let idleTimeout = null;
-    function handleUserActivity() {
-      controlsContainer.classList.remove('hidden');
-      topHud.classList.remove('hidden');
-      clearTimeout(idleTimeout);
+    document.addEventListener('webkitfullscreenchange', () => {
+      if (document.webkitFullscreenElement) {
+        document.body.classList.add('is-fullscreen');
+      } else {
+        document.body.classList.remove('is-fullscreen');
+      }
+      updateFullscreenButton();
+    });
 
-      // Modal veya dropdown açıkken kontrolleri gizleme
+    // Otomatik Kontrol Gizleme (Idle) & Boş Alana Dokunma ile Gizleme
+    let idleTimeout = null;
+    function resetIdleTimer() {
+      clearTimeout(idleTimeout);
       if (settingsModalBackdrop.classList.contains('open') || (gkDropdownMenu && gkDropdownMenu.classList.contains('show'))) {
         return;
       }
-
       idleTimeout = setTimeout(() => {
         if (!settingsModalBackdrop.classList.contains('open') && (!gkDropdownMenu || !gkDropdownMenu.classList.contains('show'))) {
           controlsContainer.classList.add('hidden');
@@ -1381,10 +1665,31 @@
       }, 3500);
     }
 
-    window.addEventListener('mousemove', handleUserActivity);
-    window.addEventListener('touchstart', handleUserActivity);
+    function showControls() {
+      controlsContainer.classList.remove('hidden');
+      topHud.classList.remove('hidden');
+      resetIdleTimer();
+    }
+
+    window.addEventListener('mousemove', showControls);
+
+    // Ekrana dokunulduğunda: Butonlara tıklanmadıysa kontrolleri aç/kapat (toggle)
+    document.body.addEventListener('click', (e) => {
+      if (e.target.closest('#controlsContainer') || e.target.closest('.modal-backdrop') || e.target.closest('.top-hud')) {
+        resetIdleTimer();
+        return;
+      }
+      const isHidden = controlsContainer.classList.contains('hidden');
+      if (isHidden) {
+        showControls();
+      } else {
+        controlsContainer.classList.add('hidden');
+        topHud.classList.add('hidden');
+      }
+    });
+
     window.addEventListener('keydown', (e) => {
-      handleUserActivity();
+      showControls();
       if (e.key === 'Escape') {
         if (settingsModalBackdrop.classList.contains('open')) {
           closeSettingsModal();
@@ -1400,15 +1705,27 @@
       if (e.key === ' ') {
         if (currentMode === 'exam' && !settingsModalBackdrop.classList.contains('open')) {
           e.preventDefault();
+          initAudio();
           isExamRunning = !isExamRunning;
           updatePlayPauseButton();
         }
       }
     });
 
+    window.addEventListener('resize', () => {
+      if (currentMode === 'real') {
+        modeDisplayLabel.textContent = window.innerWidth <= 480 ? '🕒 Canlı' : '🕒 Canlı Gerçek Saat';
+      } else {
+        modeDisplayLabel.textContent = window.innerWidth <= 480 ? '📝 Prova' : '📝 KPSS Prova';
+      }
+      if (currentMode === 'exam') {
+        updateExamHUD();
+      }
+    });
+
     // Başlangıç
     loadSavedConfig();
-    handleUserActivity();
+    showControls();
     requestAnimationFrame(render);
   </script>
 </body>
